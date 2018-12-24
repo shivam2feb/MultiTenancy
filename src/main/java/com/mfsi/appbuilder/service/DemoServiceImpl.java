@@ -60,6 +60,8 @@ public class DemoServiceImpl implements DemoService{
 	public Map<String,Object> prepareMapForTemplate(Model model){
 		Map<String,Object> templateMap=new HashMap<String,Object>();
 		templateMap.put("params", model.getParameterList());
+		templateMap.put("tableName", model.getTableName());
+		templateMap.put("EntityName", model.getModelName());
 		return new HashMap<String,Object>();
 	}
 }

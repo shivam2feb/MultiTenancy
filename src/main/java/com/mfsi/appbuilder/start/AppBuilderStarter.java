@@ -1,12 +1,7 @@
 package com.mfsi.appbuilder.start;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,20 +9,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
-
-import com.mfsi.appbuilder.controller.DemoController;
 import com.mfsi.appbuilder.entity.Parameter;
-
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 
 @SpringBootApplication
 @ComponentScan(basePackages="com.demo")
 @EntityScan(basePackages="com.demo")
-public class StartApplication {
+public class AppBuilderStarter {
 
 	public static void main(String[] args) {
-		SpringApplication.run(StartApplication.class, args);
+		SpringApplication.run(AppBuilderStarter.class, args);
 		/*Map<String,Object> paramMap=new HashMap<>();
 		paramMap.put("EntityName", "Model");
 		paramMap.put("idType", "Long");

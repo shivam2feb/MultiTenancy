@@ -39,7 +39,6 @@ public class DemoController {
 
 	@RequestMapping(value="/model",method=RequestMethod.POST)
 	public void saveEntity(@RequestBody Model model) {
-		System.out.println("value of src is fd "+src+" value of dest is "+dest);
 		if(demoService.copyFolder(src, dest+"\\"+model.getApplicationName())) {
 			System.out.println("Inside controller. Folder is copied to destination.");
 			Map<String,Object> templateMap=demoService.prepareMapForTemplate(model);
