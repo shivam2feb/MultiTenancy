@@ -14,10 +14,10 @@ import com.mfsi.appbuilder.entity.Parameter;
 @SpringBootApplication
 @ComponentScan(basePackages="com.demo")
 @EntityScan(basePackages="com.demo")
-public class AppBuilderStarter {
+public class AppBuilderApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AppBuilderStarter.class, args);
+		SpringApplication.run(AppBuilderApplication.class, args);
 		/*Map<String,Object> paramMap=new HashMap<>();
 		paramMap.put("EntityName", "Model");
 		paramMap.put("idType", "Long");
