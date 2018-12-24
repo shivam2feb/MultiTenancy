@@ -24,8 +24,8 @@ public class ${EntityName}Controller {
 	}
 	
 	@RequestMapping(value="/${entityName}",method=RequestMethod.PUT)
-	public void update${EntityName}(@RequestBody Model model) {
-		templateService.update${EntityName}(model);
+	public void update${EntityName}(@RequestBody ${EntityName} ${entityName}) {
+		templateService.update${EntityName}(${entityName});
 	}
 	
 	@RequestMapping(value="/${entityName}/{id}}",method=RequestMethod.DELETE)

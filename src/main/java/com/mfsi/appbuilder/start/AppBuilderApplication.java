@@ -12,8 +12,8 @@ import org.springframework.context.annotation.ComponentScan;
 import com.mfsi.appbuilder.entity.Parameter;
 
 @SpringBootApplication
-@ComponentScan(basePackages="com.demo")
-@EntityScan(basePackages="com.demo")
+@ComponentScan(basePackages="com.mfsi")
+@EntityScan(basePackages="com.mfsi")
 public class AppBuilderApplication {
 
 	public static void main(String[] args) {

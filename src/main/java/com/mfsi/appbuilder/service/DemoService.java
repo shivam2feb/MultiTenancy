@@ -8,6 +8,6 @@ public interface DemoService {
 
 	
 	public boolean copyFolder(String srcPath, String dscPath);
-
-	public Map<String, Object> prepareMapForTemplate(Model model);
+	public Map<String,Map<String, Object>> prepareMapForTemplate(Model model);
+	public void generateFileFromTemplate(Map<String,Object> map,String templateName,String fileName);
 }

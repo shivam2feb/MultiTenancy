@@ -14,6 +14,6 @@ public class SwaggerConfiguration {
 
 	@Bean
 	public Docket swaggerDocket() {
-		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage("com.demo")).build();
+		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage("com.mfsi")).build();
 	}
 }

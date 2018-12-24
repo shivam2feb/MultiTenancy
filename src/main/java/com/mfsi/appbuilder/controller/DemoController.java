@@ -41,7 +41,12 @@ public class DemoController {
 	public void saveEntity(@RequestBody Model model) {
 		if(demoService.copyFolder(src, dest+"\\"+model.getApplicationName())) {
 			System.out.println("Inside controller. Folder is copied to destination.");
-			Map<String,Object> templateMap=demoService.prepareMapForTemplate(model);
+			Map<String,Map<String,Object>> listOfMap=demoService.prepareMapForTemplate(model);
+			demoService.generateFileFromTemplate(listOfMap.get("entityMap"), "EntityTemplate.ftl", model.getModelName());
+			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "ControllerTemplate.ftl", model.getModelName());
+			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "RepositoryTemplate.ftl", model.getModelName());
+			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "ServiceImplTemplate.ftl", model.getModelName());
+			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "ServiceTemplate.ftl", model.getModelName());
 		}
 	}
 
@@ -72,17 +77,5 @@ public class DemoController {
 		//generatePojo(templateMap,"");
 	}
 
-	public void generatePojo(Map<String,Object> map,String templateName,String fileName) {
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-		try{
-			cfg.setDirectoryForTemplateLoading(new File(System.getProperty("user.dir")+"\\src\\main\\resources\\templates"));
-			cfg.setDefaultEncoding("UTF-8");
-			Template template=cfg.getTemplate(templateName);
-			Writer writer=new FileWriter(new File("C:\\Users\\Shivam.Sharma\\Desktop\\FTL\\GeneratedFiles\\"+fileName+"-"+
-					String.valueOf(new Date().getTime()).substring(9)+".java"));
-			template.process(map, writer);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 }
