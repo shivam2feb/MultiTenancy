@@ -1,4 +1,4 @@
-package com.demo.service;
+package com.mfsi.appbuilder.service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,8 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
+
+import com.mfsi.appbuilder.entity.Model;
 
 @Service
 public class DemoServiceImpl implements DemoService{
@@ -51,5 +55,11 @@ public class DemoServiceImpl implements DemoService{
 			out.close();
 			System.out.println("File copied from "+src+ " to "+dest);
 		}
+	}
+	
+	public Map<String,Object> prepareMapForTemplate(Model model){
+		Map<String,Object> templateMap=new HashMap<String,Object>();
+		templateMap.put("params", model.getParameterList());
+		return new HashMap<String,Object>();
 	}
 }

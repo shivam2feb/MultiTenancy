@@ -1,4 +1,4 @@
-package com.demo.entity;
+package com.mfsi.appbuilder.entity;
 
 public class Parameter {
 

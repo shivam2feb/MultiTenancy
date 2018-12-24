@@ -1,4 +1,4 @@
-package com.demo.controller;
+package com.mfsi.appbuilder.controller;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.demo.entity.Model;
-import com.demo.entity.Parameter;
-import com.demo.service.DemoService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mfsi.appbuilder.entity.Model;
+import com.mfsi.appbuilder.entity.Parameter;
+import com.mfsi.appbuilder.service.DemoService;
+
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -41,6 +42,7 @@ public class DemoController {
 		System.out.println("value of src is fd "+src+" value of dest is "+dest);
 		if(demoService.copyFolder(src, dest+"\\"+model.getApplicationName())) {
 			System.out.println("Inside controller. Folder is copied to destination.");
+			Map<String,Object> templateMap=demoService.prepareMapForTemplate(model);
 		}
 	}
 

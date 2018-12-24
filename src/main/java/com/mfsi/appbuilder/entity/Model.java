@@ -1,4 +1,4 @@
-package com.demo.entity;
+package com.mfsi.appbuilder.entity;
 
 import java.util.*;
 import javax.persistence.*;

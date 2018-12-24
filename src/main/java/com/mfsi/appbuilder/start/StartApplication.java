@@ -1,4 +1,4 @@
-package com.demo.start;
+package com.mfsi.appbuilder.start;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,8 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 
-import com.demo.controller.DemoController;
-import com.demo.entity.Parameter;
+import com.mfsi.appbuilder.controller.DemoController;
+import com.mfsi.appbuilder.entity.Parameter;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
