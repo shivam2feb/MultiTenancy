@@ -20,16 +20,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.entity.Model;
 import com.mfsi.appbuilder.entity.Parameter;
-import com.mfsi.appbuilder.service.DemoService;
+import com.mfsi.appbuilder.service.AppService;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @RestController
-public class DemoController {
+public class AppController {
 
 	@Autowired
-	DemoService demoService;
+	AppService demoService;
 	
 	@Value("${templateSource}")
 	private String src;

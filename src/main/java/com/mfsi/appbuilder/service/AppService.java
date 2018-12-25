@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.mfsi.appbuilder.entity.Model;
 
-public interface DemoService {
+public interface AppService {
 
 	
 	public boolean copyFolder(String srcPath, String dscPath);

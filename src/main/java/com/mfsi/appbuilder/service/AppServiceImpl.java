@@ -22,7 +22,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @Service
-public class DemoServiceImpl implements DemoService{
+public class AppServiceImpl implements AppService{
 
 	public boolean copyFolder(String srcPath, String dscPath) {
 		File srcFolder=new File(srcPath);
