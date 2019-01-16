@@ -5,27 +5,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
-import com.mfsi.appbuilder.entity.Parameter;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
+import com.mfsi.appbuilder.controller.AppController;
+import com.mfsi.appbuilder.model.Parameter;
 
 @SpringBootApplication
-@ComponentScan(basePackages="com.demo")
-@EntityScan(basePackages="com.demo")
+@ComponentScan(basePackages="com.mfsi")
+@EntityScan(basePackages="com.mfsi")
+@EnableMongoRepositories(basePackages="com.mfsi.appbuilder.repository")
 public class AppBuilderApplication {
 
+	//private static final Logger logger =LoggerFactory.getLogger(AppBuilderApplication.class);
+	
 	public static void main(String[] args) {
 		SpringApplication.run(AppBuilderApplication.class, args);
-		/*Map<String,Object> paramMap=new HashMap<>();
-		paramMap.put("EntityName", "Model");
-		paramMap.put("idType", "Long");
-		DemoController demo=new DemoController();*/
-		/*demo.generatePojo(paramMap, "ControllerTemplate.ftl","ModelController");
-		demo.generatePojo(paramMap, "RepositoryTemplate.ftl","ModelRepository");
-		demo.generatePojo(paramMap, "ServiceImplTemplate.ftl","ModelServiceImpl");
-		demo.generatePojo(paramMap, "ServiceTemplate.ftl","ModelService");*/
+		System.out.println("Inside Starter Application class");
+		//logger.error("Inside main method of AppBuilderApplication class");
 	}
 
 	public static void prepareMap(Map<String,Object> map) {
