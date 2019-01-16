@@ -14,15 +14,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.mfsi.appbuilder.entity.Model;
+import com.mfsi.appbuilder.model.Model;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @Service
 public class AppServiceImpl implements AppService{
+
+	@Value("${templateSource}")
+	private String src;
+
+	@Value("${destinationSource}")
+	private String dest;
+
+	static final String GENERIC_MAP="genericMap";
+	static final String BASE_JAVA_FOLDER="src\\main\\java\\";
+	static final String BASE_PACKAGE="com\\app\\";
 
 	public boolean copyFolder(String srcPath, String dscPath) {
 		File srcFolder=new File(srcPath);
@@ -33,7 +44,6 @@ public class AppServiceImpl implements AppService{
 			return true;
 		}catch(IOException e) {
 			e.printStackTrace();
-			System.exit(0);
 			return false;
 		}
 	}
@@ -82,18 +92,41 @@ public class AppServiceImpl implements AppService{
 		mapsOfTemplate.put("genericMap", genericMap);
 		return mapsOfTemplate;
 	}
-	
-	public void generateFileFromTemplate(Map<String,Object> map,String templateName,String fileName) {
+
+	public void generateFileFromTemplate(Map<String,Object> map,String templateName,String location,String fileName) {
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
 		try{
 			cfg.setDirectoryForTemplateLoading(new File(System.getProperty("user.dir")+"\\src\\main\\resources\\templates"));
 			cfg.setDefaultEncoding("UTF-8");
 			Template template=cfg.getTemplate(templateName);
-			Writer writer=new FileWriter(new File("C:\\Users\\Shivam.Sharma\\Desktop\\FTL\\GeneratedFiles\\"+fileName+"-"+
-					String.valueOf(new Date().getTime()).substring(9)+".java"));
+			File file=new File(location+fileName+".java");
+			file.createNewFile();
+			Writer writer=new FileWriter(file);
 			template.process(map, writer);
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void generateFilesFromTemplate(Map<String,Map<String,Object>> listOfMap,Model model,String src,String dest) {
+		final String modelName=model.getModelName();
+		generateFileFromTemplate(listOfMap.get("entityMap"), "EntityTemplate.ftl",dest+BASE_JAVA_FOLDER+
+				BASE_PACKAGE+"entity\\",modelName);
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
+				BASE_PACKAGE+"controller\\", modelName+"Controller");
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "RepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
+				BASE_PACKAGE+"repository\\", modelName+"Repository");
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
+				BASE_PACKAGE+"service\\", modelName+"Service");
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
+				BASE_PACKAGE+"service\\", modelName+"ServiceImpl");
+	}
+	
+	public void compileProject(String fileLocation) {
+		
+	}
+	
+	public static void runProcess(String command) throws IOException{
+		Process process=Runtime.getRuntime().exec(command);
 	}
 }

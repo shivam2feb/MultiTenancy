@@ -1,29 +1,24 @@
 package com.mfsi.appbuilder.controller;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mfsi.appbuilder.entity.Model;
-import com.mfsi.appbuilder.entity.Parameter;
+import com.mfsi.appbuilder.model.Model;
+import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
+import com.mfsi.appbuilder.service.PersistenceService;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 
 @RestController
 public class AppController {
@@ -31,28 +26,34 @@ public class AppController {
 	@Autowired
 	AppService demoService;
 	
+	@Autowired
+	PersistenceService persistenceService;
+	
 	@Value("${templateSource}")
 	private String src;
 
 	@Value("${destinationSource}")
-	private String dest;
+	private String destination;
+	
+	//private static final Logger logger =LoggerFactory.getLogger(AppController.class);
+	
 
-	@RequestMapping(value="/model",method=RequestMethod.POST)
-	public void saveEntity(@RequestBody Model model) {
-		if(demoService.copyFolder(src, dest+"\\"+model.getApplicationName())) {
-			System.out.println("Inside controller. Folder is copied to destination.");
+	@PostMapping(value="/model")
+	public void createProject(@RequestBody Model model) {
+		String dest=destination+"\\"+model.getApplicationName();
+		if(demoService.copyFolder(src, dest)) {
+			//logger.info("Inside controller. Folder is copied to destination.");
+			String entityName=model.getModelName();
+			entityName=entityName.substring(0,1).toUpperCase()+entityName.substring(1);
+			model.setModelName(entityName);
 			Map<String,Map<String,Object>> listOfMap=demoService.prepareMapForTemplate(model);
-			demoService.generateFileFromTemplate(listOfMap.get("entityMap"), "EntityTemplate.ftl", model.getModelName());
-			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "ControllerTemplate.ftl", model.getModelName());
-			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "RepositoryTemplate.ftl", model.getModelName());
-			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "ServiceImplTemplate.ftl", model.getModelName());
-			demoService.generateFileFromTemplate(listOfMap.get("genericMap"), "ServiceTemplate.ftl", model.getModelName());
+			demoService.generateFilesFromTemplate(listOfMap,model,src,dest+"\\");
 		}
 	}
 
-	@RequestMapping(value="/createPojo", method=RequestMethod.POST)
+	@PostMapping(value="/createPojo")
 	public void generatePojo(@RequestBody String jsonObj) {
-		Map<String,Object> templateMap=new HashMap<String,Object>();
+		Map<String,Object> templateMap=new HashMap<>();
 		System.out.println("Json String is "+jsonObj);
 		ObjectMapper mapper=new ObjectMapper(); 
 		Map<String,Object> map=new HashMap<>();
@@ -66,16 +67,32 @@ public class AppController {
 		templateMap.put("params", listOfParam);
 		templateMap.put("EntityName", "Model");
 
-		for(String str:map.keySet()) {
+		for(Entry<String, Object> entrySet:map.entrySet()) {
 			Parameter param= new Parameter();
-			//param.setColumnName("Col_"+str);
-			param.setDataType(map.get(str).getClass().getSimpleName());
-			param.setName(str);
-			System.out.println("Value of "+str+" is "+map.get(str)+" -"+map.get(str).getClass().getSimpleName());
+			param.setDataType(entrySet.getValue().getClass().getSimpleName());
+			param.setName(entrySet.getKey());
 			listOfParam.add(param);
 		}
 		//generatePojo(templateMap,"");
 	}
-
 	
+	@PostMapping("/createProject1")
+	public boolean createProject1(@RequestBody String jsonString) {
+		ObjectMapper mapper=new ObjectMapper();
+		Map<String,Object> jsonObject=new HashMap<>();
+		try {
+			mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
+		}catch(Exception e) {
+			//logger.error("Error while parsing the the JSON String {}",e);
+			e.printStackTrace();
+		}
+		System.out.println(jsonObject.get("proojectName"));
+		//persistenceService.saveProject("MyProject");
+		return true;
+	}
+	/*
+	 * @GetMapping("/getProject/{projectId}") public Project
+	 * getProject(@PathVariable(name="projectId") int id) { return
+	 * persistenceService.getProject(id); }
+	 */
 }
