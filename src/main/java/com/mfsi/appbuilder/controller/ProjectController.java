@@ -3,6 +3,7 @@ package com.mfsi.appbuilder.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,20 +11,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
+import com.mfsi.appbuilder.dto.APIDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.service.PersistenceService;
 
 @RestController
 @RequestMapping("/project")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProjectController {
 
 	@Autowired
 	PersistenceService persistenceService;
 
-	@GetMapping("/byName/{projectName}")
-	private Project getProject(@PathVariable String projectName) {
-		return persistenceService.getProject(projectName);
+	@GetMapping("/byName/{userName}")
+	private List<Project> getProject(@PathVariable String userName) {
+		return persistenceService.getProject(userName);
 	}
 
 	@PostMapping("/create")
@@ -32,7 +36,18 @@ public class ProjectController {
 	}
 
 	@GetMapping("/getAll")
-	private List<Project> getAllProjects(@PathVariable String projectName) {
+	private List<Project> getAllProjects() {
 		return persistenceService.getAllProjects();
 	}
+	
+	@PostMapping("/createAPI")
+	private void createAPI(@RequestBody APIDTO apiDTO) {
+		persistenceService.createAPI(apiDTO);
+	}
+	
+	@GetMapping("/getApiByProjectId/{projectId}")
+	private List<API> getAPI(@PathVariable String projectId) {
+		return persistenceService.getAPI(projectId);
+	}
+	
 }

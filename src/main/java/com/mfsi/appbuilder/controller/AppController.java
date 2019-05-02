@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import com.mfsi.appbuilder.service.PersistenceService;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class AppController {
 
 	@Autowired
@@ -90,6 +92,19 @@ public class AppController {
 		//persistenceService.saveProject("MyProject");
 		return true;
 	}
+	
+	
+	/*
+	 * @GetMapping("/createProject1") public boolean createProject1(@RequestBody
+	 * String jsonString) { ObjectMapper mapper=new ObjectMapper();
+	 * Map<String,Object> jsonObject=new HashMap<>(); try {
+	 * mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
+	 * }catch(Exception e) {
+	 * //logger.error("Error while parsing the the JSON String {}",e);
+	 * e.printStackTrace(); } System.out.println(jsonObject.get("proojectName"));
+	 * //persistenceService.saveProject("MyProject"); return true; }
+	 */
+	
 	/*
 	 * @GetMapping("/getProject/{projectId}") public Project
 	 * getProject(@PathVariable(name="projectId") int id) { return
