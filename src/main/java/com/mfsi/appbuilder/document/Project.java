@@ -9,6 +9,8 @@ import javax.persistence.Id;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.mfsi.appbuilder.dto.User;
+
 @Document
 public class Project {
 	
@@ -18,7 +20,18 @@ public class Project {
 	private String projectName;
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
 	private LocalDateTime lastUpdatedOn;
+	private User user;
 	
+	
+	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public String getId() {
 		return id;
 	}

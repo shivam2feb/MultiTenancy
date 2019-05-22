@@ -6,6 +6,21 @@ public class APIDTO {
 	private String apiName;
 	private String apiType;
 	private String jsonString;
+	private String projectID;
+	
+	
+
+	public String getProjectID() {
+		return projectID;
+	}
+
+	public void setProjectID(String projectID) {
+		this.projectID = projectID;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getId() {
 		return this.id;
