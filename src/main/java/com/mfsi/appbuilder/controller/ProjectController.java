@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
-import com.mfsi.appbuilder.dto.APIDTO;
+import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.service.PersistenceService;
 
@@ -41,7 +41,7 @@ public class ProjectController {
 	}
 	
 	@PostMapping("/createAPI")
-	private void createAPI(@RequestBody APIDTO apiDTO) {
+	private void createAPI(@RequestBody ApiDto apiDTO) {
 		persistenceService.createAPI(apiDTO);
 	}
 	

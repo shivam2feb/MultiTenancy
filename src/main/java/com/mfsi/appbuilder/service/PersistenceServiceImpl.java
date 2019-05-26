@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
-import com.mfsi.appbuilder.dto.APIDTO;
+import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.User;
 import com.mfsi.appbuilder.repository.APIRepository;
@@ -45,13 +45,13 @@ public class PersistenceServiceImpl implements PersistenceService{
 	}
 
 	@Override
-	public void createAPI(APIDTO apiDTO) {
+	public void createAPI(ApiDto apiDTO) {
 		// TODO Auto-generated method stub
 		API api = new API();
 		api.setApiName(apiDTO.getApiName());
 		api.setApiType(apiDTO.getApiType());
-		api.setJsonString(apiDTO.getJsonString());
-		api.setProjectID(apiDTO.getProjectID());
+//		api.setJsonString(apiDTO.getJsonString());
+		api.setProjectID(apiDTO.getProjectName());
 		apiRepository.save(api);
 	}
 	
