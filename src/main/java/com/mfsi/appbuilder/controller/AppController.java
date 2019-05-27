@@ -13,8 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mfsi.appbuilder.dto.ApiDto;
+import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
@@ -52,6 +55,24 @@ public class AppController {
 			demoService.generateFilesFromTemplate(listOfMap,model,src,dest+"\\");
 		}
 	}
+	
+	@PostMapping(value="/createNewApi")
+	public void createNewApi(@RequestBody ApiDto apiDto) {
+		String dest=destination+"\\"+apiDto.getProjectName();
+		
+		if(demoService.copyFolder(src, dest)) {
+		
+			Map<String, List<ApiJsonTemplate>> listOfMap=demoService.prepareMapForTemplateV2(apiDto);
+			demoService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",apiDto);
+			
+		}
+	
+		
+		
+		
+		
+		
+	}
 
 	@PostMapping(value="/createPojo")
 	public void generatePojo(@RequestBody String jsonObj) {
@@ -65,14 +86,19 @@ public class AppController {
 			e.printStackTrace();
 		}
 		List<Parameter> listOfParam=new ArrayList<>();
-		listOfParam.add(new Parameter("Long","id","Unique_Id",true));
+		
+		Parameter param1 = new Parameter();
+		param1.setDataType("Long");
+		param1.setColumnName("id");
+		param1.setIsPrimaryKey(true);
+		listOfParam.add(param1);
 		templateMap.put("params", listOfParam);
 		templateMap.put("EntityName", "Model");
 
 		for(Entry<String, Object> entrySet:map.entrySet()) {
 			Parameter param= new Parameter();
 			param.setDataType(entrySet.getValue().getClass().getSimpleName());
-			param.setName(entrySet.getKey());
+			param.setColumnName(entrySet.getKey());
 			listOfParam.add(param);
 		}
 		//generatePojo(templateMap,"");
