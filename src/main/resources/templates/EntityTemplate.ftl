@@ -1,4 +1,4 @@
-package com.app.entity;
+package com.app.${ApiName}.entity;
 
 import java.util.*;
 import javax.persistence.*;

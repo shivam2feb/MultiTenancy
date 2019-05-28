@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mfsi.appbuilder.dto.ApiDto;
+import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 
@@ -39,6 +39,8 @@ public class AppServiceImpl implements AppService{
 	static final String GENERIC_MAP="genericMap";
 	static final String BASE_JAVA_FOLDER="src\\main\\java\\";
 	static final String BASE_PACKAGE="com\\app\\";
+	
+	
 
 	public boolean copyFolder(String srcPath, String dscPath) {
 		File srcFolder=new File(srcPath);
@@ -98,7 +100,7 @@ public class AppServiceImpl implements AppService{
 		return mapsOfTemplate;
 	}
 
-	public Map<String,List<ApiJsonTemplate>> prepareMapForTemplateV2(ApiDto model){
+	public Map<String,List<ApiJsonTemplate>> prepareMapForTemplateV2(API model){
 		
 		Map<String,List<ApiJsonTemplate>> mapsOfTemplate = prepareEntitiesMap(model.getJsonString());
 		
@@ -187,7 +189,9 @@ public class AppServiceImpl implements AppService{
 			cfg.setDirectoryForTemplateLoading(new File(System.getProperty("user.dir")+"\\src\\main\\resources\\templates"));
 			cfg.setDefaultEncoding("UTF-8");
 			Template template=cfg.getTemplate(templateName);
-			File file=new File(location+fileName+".java");
+			File file=new File(location);
+			file.mkdirs();
+			file=new File(location+fileName+".java");
 			file.createNewFile();
 			Writer writer=new FileWriter(file);
 			template.process(map, writer);
@@ -210,7 +214,7 @@ public class AppServiceImpl implements AppService{
 				BASE_PACKAGE+"service\\", modelName+"ServiceImpl");
 	}
 	
-	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> listOfMap,String src,String dest,ApiDto apiDto) {
+	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> listOfMap,String src,String dest,API apiDto) {
 		
 		Set<String> entities = listOfMap.keySet();
 		
@@ -220,25 +224,48 @@ public class AppServiceImpl implements AppService{
 			entityMap.put("params", listOfMap.get(entityName));
 			entityMap.put("tableName", entityName);
 			entityMap.put("EntityName", entityName);
+			entityMap.put("ApiName", apiDto.getApiName());
+
 			generateFileFromTemplateV2(entityMap, "EntityTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+"entity\\",entityName);
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"entity\\",entityName);
 		}
 		Map<String,Object> entityMap=new HashMap<>();
 		entityMap.put("EntityName", apiDto.getMainEntityName());
 		entityMap.put("ApiName", apiDto.getApiName());
 		entityMap.put("ApiUrl", apiDto.getApiUrl());
 		entityMap.put("idType", apiDto.getMainEntityIdType());
-		generateFileFromTemplateV2(entityMap, "PostControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"controller\\", apiDto.getApiName()+"Controller");
 		
+		if(apiDto.getApiType().equalsIgnoreCase("post")) {
 		
-		generateFileFromTemplateV2(entityMap, "PostServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"service\\", apiDto.getApiName()+"Service");
-		generateFileFromTemplateV2(entityMap, "PostServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"service\\", apiDto.getApiName()+"ServiceImpl");
-		
-		generateFileFromTemplateV2(entityMap, "PostRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"repository\\", apiDto.getApiName()+"Repository");
+			generateFileFromTemplateV2(entityMap, "PostControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"controller\\", apiDto.getApiName()+"Controller");
+			
+			
+			generateFileFromTemplateV2(entityMap, "PostServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"Service");
+			generateFileFromTemplateV2(entityMap, "PostServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
+			
+			generateFileFromTemplateV2(entityMap, "PostRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
+		}else if(apiDto.getApiType().equalsIgnoreCase("put")) {
+			generateFileFromTemplateV2(entityMap, "PutControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"controller\\", apiDto.getApiName()+"Controller");
+			
+			
+			generateFileFromTemplateV2(entityMap, "PutServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"Service");
+			generateFileFromTemplateV2(entityMap, "PutServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
+			
+			generateFileFromTemplateV2(entityMap, "PutRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
+			
+		}else if(apiDto.getApiType().equalsIgnoreCase("get")) {
+			
+		}else if(apiDto.getApiType().equalsIgnoreCase("delete")) {
+			
+		}
 		
 		/*
 		 * generateFileFromTemplate(listOfMap.get("entityMap"),

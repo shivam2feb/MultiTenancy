@@ -16,9 +16,9 @@ public class ${ApiName}Controller {
 	${ApiName}Service ${serviceName};
 	
 	
-	@RequestMapping(value="/${ApiUrl}",method=RequestMethod.POST)
-	public void add${EntityName}(@RequestBody ${EntityName} ${entityName}) {
-		${serviceName}.add${EntityName}(${entityName});
+	@RequestMapping(value="/${ApiUrl}",method=RequestMethod.Put)
+	public void update${EntityName}(@RequestBody ${EntityName} ${entityName}) {
+		${serviceName}.update${EntityName}(${entityName});
 	}
 	
 
