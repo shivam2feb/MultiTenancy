@@ -18,7 +18,7 @@ public class ${ApiName}ServiceImpl implements ${ApiName}Service{
 	@Autowired 
 	${ApiName}Repository repository;
 	
-	public void add${EntityName}(${EntityName} ${entityName}) {
+	public void update${EntityName}(${EntityName} ${entityName}) {
 		repository.save(${entityName});
 		
 	}

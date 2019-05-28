@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
@@ -56,22 +58,18 @@ public class AppController {
 		}
 	}
 	
-	@PostMapping(value="/createNewApi")
-	public void createNewApi(@RequestBody ApiDto apiDto) {
-		String dest=destination+"\\"+apiDto.getProjectName();
-		
-		if(demoService.copyFolder(src, dest)) {
-		
-			Map<String, List<ApiJsonTemplate>> listOfMap=demoService.prepareMapForTemplateV2(apiDto);
-			demoService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",apiDto);
-			
-		}
-	
-		
-		
-		
-		
-		
+	@PostMapping(value="/downloadProject")
+	public void downloadProject(@RequestParam String projectId) {
+		// fetch from db 
+		List<API> apis = persistenceService.getAPI(projectId);
+		// loop on all apiDto
+		for (API api : apis) {
+			String dest=destination+"\\"+api.getProjectName();
+			if(demoService.copyFolder(src, dest)) {
+				Map<String, List<ApiJsonTemplate>> listOfMap=demoService.prepareMapForTemplateV2(api);
+				demoService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",api);
+			}
+		}	
 	}
 
 	@PostMapping(value="/createPojo")
