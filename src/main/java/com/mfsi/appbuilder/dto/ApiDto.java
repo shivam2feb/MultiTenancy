@@ -11,11 +11,20 @@ public class ApiDto {
 	private String apiType;
 	private List<ApiJsonTemplate> jsonString;
 	private String projectName;
+	private String projectId;
 	private String apiUrl;
 	private String mainEntityName;
 	private String mainEntityIdType;
 
 	
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
 	public String getMainEntityIdType() {
 		return mainEntityIdType;
 	}

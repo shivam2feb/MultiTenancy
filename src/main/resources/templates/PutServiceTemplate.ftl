@@ -7,5 +7,5 @@ import com.app.entity.*;
 
 public interface ${ApiName}Service {
 
-	public void add${EntityName}(${EntityName} ${entityName});
+	public void update${EntityName}(${EntityName} ${entityName});
 }

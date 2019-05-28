@@ -45,13 +45,7 @@ public class PersistenceServiceImpl implements PersistenceService{
 	}
 
 	@Override
-	public void createAPI(ApiDto apiDTO) {
-		// TODO Auto-generated method stub
-		API api = new API();
-		api.setApiName(apiDTO.getApiName());
-		api.setApiType(apiDTO.getApiType());
-//		api.setJsonString(apiDTO.getJsonString());
-		api.setProjectID(apiDTO.getProjectName());
+	public void createAPI(API api) {
 		apiRepository.save(api);
 	}
 	
