@@ -10,7 +10,7 @@ import com.mfsi.appbuilder.document.API;
 @Repository
 public interface APIRepository extends MongoRepository<API, String>{
 	
-	public List<API> findByProjectID(String projectID);
+	public List<API> findByProjectId(String projectId);
 	
 }
 

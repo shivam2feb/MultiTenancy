@@ -59,7 +59,7 @@ public class AppController {
 	}
 	
 	@PostMapping(value="/downloadProject")
-	public void downloadProject(@RequestParam String projectId) {
+	public void downloadProject(@RequestBody String projectId) {
 		// fetch from db 
 		List<API> apis = persistenceService.getAPI(projectId);
 		// loop on all apiDto

@@ -2,6 +2,10 @@ package com.mfsi.appbuilder.dto;
 
 import java.util.List;
 
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 
 public class ApiDto {
@@ -88,5 +92,13 @@ public class ApiDto {
 	public void setApiType(String apiType) {
 		this.apiType = apiType;
 	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+	
+	
 
 }
