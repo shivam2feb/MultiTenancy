@@ -1,6 +1,16 @@
 package com.mfsi.appbuilder.service;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -47,7 +57,7 @@ public class AppServiceImpl implements AppService{
 		File dscFolder=new File(dscPath);
 		try {
 			copyFolder(srcFolder,dscFolder);
-			System.out.println("Folder is copied");
+			//System.out.println("Folder is copied");
 			return true;
 		}catch(IOException e) {
 			e.printStackTrace();
@@ -60,7 +70,7 @@ public class AppServiceImpl implements AppService{
 		if(src.isDirectory()) {
 			if(!dest.exists()) {
 				dest.mkdirs();
-				System.out.println("Directory is created having path "+dest.getAbsolutePath());
+				//System.out.println("Directory is created having path "+dest.getAbsolutePath());
 			}
 			String[] files=src.list();
 			for(String file:files) {
@@ -116,12 +126,11 @@ public class AppServiceImpl implements AppService{
 		}
 
 		ObjectMapper mapper = new ObjectMapper();
-		try {
-			System.out.println(mapper.writeValueAsString(entitiesMap));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		/*
+		 * try { System.out.println(mapper.writeValueAsString(entitiesMap)); } catch
+		 * (JsonProcessingException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
 		return entitiesMap;
 	}
 	
@@ -178,6 +187,7 @@ public class AppServiceImpl implements AppService{
 			file.createNewFile();
 			Writer writer=new FileWriter(file);
 			template.process(map, writer);
+			writer.close();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -195,6 +205,7 @@ public class AppServiceImpl implements AppService{
 			file.createNewFile();
 			Writer writer=new FileWriter(file);
 			template.process(map, writer);
+			writer.close();
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -293,4 +304,6 @@ public class AppServiceImpl implements AppService{
 	public static void runProcess(String command) throws IOException{
 		Process process=Runtime.getRuntime().exec(command);
 	}
+	
+	 
 }
