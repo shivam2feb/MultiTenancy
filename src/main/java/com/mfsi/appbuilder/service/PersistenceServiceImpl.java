@@ -77,6 +77,7 @@ public class PersistenceServiceImpl implements PersistenceService{
 		api.setMainEntityIdType(apiDTO.getMainEntityIdType());
 		api.setMainEntityName(apiDTO.getMainEntityName());
 		api.setApiUrl(apiDTO.getApiUrl());
+		api.setGetParams(apiDTO.getGetParams());
 		apiRepository.save(api);
 	}
 	

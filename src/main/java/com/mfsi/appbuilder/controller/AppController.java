@@ -9,16 +9,16 @@ import java.util.Map.Entry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
-import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
@@ -31,7 +31,7 @@ import com.mfsi.appbuilder.service.PersistenceService;
 public class AppController {
 
 	@Autowired
-	AppService demoService;
+	AppService appService;
 	
 	@Autowired
 	PersistenceService persistenceService;
@@ -48,26 +48,40 @@ public class AppController {
 	@PostMapping(value="/model")
 	public void createProject(@RequestBody Model model) {
 		String dest=destination+"\\"+model.getApplicationName();
-		if(demoService.copyFolder(src, dest)) {
+		if(appService.copyFolder(src, dest)) {
 			//logger.info("Inside controller. Folder is copied to destination.");
 			String entityName=model.getModelName();
 			entityName=entityName.substring(0,1).toUpperCase()+entityName.substring(1);
 			model.setModelName(entityName);
-			Map<String,Map<String,Object>> listOfMap=demoService.prepareMapForTemplate(model);
-			demoService.generateFilesFromTemplate(listOfMap,model,src,dest+"\\");
+			Map<String,Map<String,Object>> listOfMap=appService.prepareMapForTemplate(model);
+			appService.generateFilesFromTemplate(listOfMap,model,src,dest+"\\");
 		}
 	}
 	
-	@PostMapping(value="/downloadProject")
-	public void downloadProject(@RequestBody String projectId) {
+	@GetMapping(value="/downloadProject/{projectId}")
+	public void downloadProject(@PathVariable String projectId) {
+		String getApiMethodName = "";
 		// fetch from db 
 		List<API> apis = persistenceService.getAPI(projectId);
+		ObjectMapper mapeer = new ObjectMapper();
+		
 		// loop on all apiDto
 		for (API api : apis) {
+			
+			try {
+				System.out.println(mapeer.writeValueAsString(api));
+			} catch (JsonProcessingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			if(api.getApiType().equalsIgnoreCase("get"))
+				getApiMethodName = appService.createMethodName(api.getGetParams());
+			
 			String dest=destination+"\\"+api.getProjectName();
-			if(demoService.copyFolder(src, dest)) {
-				Map<String, List<ApiJsonTemplate>> listOfMap=demoService.prepareMapForTemplateV2(api);
-				demoService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",api);
+			if(appService.copyFolder(src, dest)) {
+				Map<String, List<ApiJsonTemplate>> listOfMap=appService.prepareEntitiesMap(api.getJsonString());
+				appService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",api,getApiMethodName);
 			}
 		}	
 	}
