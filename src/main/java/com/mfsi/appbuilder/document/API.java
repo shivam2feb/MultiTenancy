@@ -17,6 +17,13 @@ public class API {
 	private String apiUrl;
 	private String mainEntityName;
 	private String mainEntityIdType;
+	private List<ApiJsonTemplate> getParams;
+	public List<ApiJsonTemplate> getGetParams() {
+		return getParams;
+	}
+	public void setGetParams(List<ApiJsonTemplate> getParams) {
+		this.getParams = getParams;
+	}
 	public String getId() {
 		return id;
 	}

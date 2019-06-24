@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +53,25 @@ public class AppServiceImpl implements AppService{
 	
 	
 
+	
+	public String createMethodName(List<ApiJsonTemplate> getParams) {
+		StringBuilder methodName = new StringBuilder("");
+		int curr = 0;
+		for (ApiJsonTemplate param : getParams) {
+			
+			if(param.getRelationship().equalsIgnoreCase("default"))	
+				methodName.append(param.getColumnName());
+			else
+				methodName.append(param.getEntityName()).append(param.getColumnName());
+			
+			if(curr != getParams.size()-1) methodName.append("And");
+			
+			curr++;
+		}
+		
+		return methodName.toString();
+	}
+	
 	public boolean copyFolder(String srcPath, String dscPath) {
 		File srcFolder=new File(srcPath);
 		File dscFolder=new File(dscPath);
@@ -88,6 +108,7 @@ public class AppServiceImpl implements AppService{
 			}
 			is.close();
 			out.close();
+			
 			System.out.println("File copied from "+src+ " to "+dest);
 		}
 	}
@@ -110,12 +131,6 @@ public class AppServiceImpl implements AppService{
 		return mapsOfTemplate;
 	}
 
-	public Map<String,List<ApiJsonTemplate>> prepareMapForTemplateV2(API model){
-		
-		Map<String,List<ApiJsonTemplate>> mapsOfTemplate = prepareEntitiesMap(model.getJsonString());
-		
-		return mapsOfTemplate;
-	}
 	
 	public Map<String,List<ApiJsonTemplate>> prepareEntitiesMap(List<ApiJsonTemplate> jsonString){
 		Map<String,List<ApiJsonTemplate>> entitiesMap = new HashMap<>();
@@ -225,18 +240,18 @@ public class AppServiceImpl implements AppService{
 				BASE_PACKAGE+"service\\", modelName+"ServiceImpl");
 	}
 	
-	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> listOfMap,String src,String dest,API apiDto) {
+	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> listOfMap,String src,String dest,API apiDto,String getApiMethodName) {
 		
 		Set<String> entities = listOfMap.keySet();
 		
-		
+		// iterating over json string for fetching all entities.
 		for (String entityName : entities) {
 			Map<String,Object> entityMap=new HashMap<>();
 			entityMap.put("params", listOfMap.get(entityName));
 			entityMap.put("tableName", entityName);
 			entityMap.put("EntityName", entityName);
 			entityMap.put("ApiName", apiDto.getApiName());
-
+			
 			generateFileFromTemplateV2(entityMap, "EntityTemplate.ftl",dest+BASE_JAVA_FOLDER+
 					BASE_PACKAGE+apiDto.getApiName()+"\\"+"entity\\",entityName);
 		}
@@ -245,6 +260,10 @@ public class AppServiceImpl implements AppService{
 		entityMap.put("ApiName", apiDto.getApiName());
 		entityMap.put("ApiUrl", apiDto.getApiUrl());
 		entityMap.put("idType", apiDto.getMainEntityIdType());
+		entityMap.put("params", apiDto.getGetParams());
+		entityMap.put("MethodName", getApiMethodName);
+		
+		System.out.println(entityMap);
 		
 		if(apiDto.getApiType().equalsIgnoreCase("post")) {
 		
@@ -273,8 +292,20 @@ public class AppServiceImpl implements AppService{
 					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
 			
 		}else if(apiDto.getApiType().equalsIgnoreCase("get")) {
+			generateFileFromTemplateV2(entityMap, "GetControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"controller\\", apiDto.getApiName()+"Controller");
+			
+			
+			generateFileFromTemplateV2(entityMap, "GetServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"Service");
+			generateFileFromTemplateV2(entityMap, "GetServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
+			
+			generateFileFromTemplateV2(entityMap, "GetRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
+					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
 			
 		}else if(apiDto.getApiType().equalsIgnoreCase("delete")) {
+			//TODO
 			
 		}
 		
