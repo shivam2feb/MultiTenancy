@@ -40,9 +40,28 @@ public class ProjectController {
 		return persistenceService.getAllProjects();
 	}
 	
+	@GetMapping("/getApis/{id}")
+	private List<API> getApiDetails(@PathVariable String id) {
+		return persistenceService.getAPI(id);
+	}
+	
+	
+	
+	
+	@GetMapping("/byProjectName/{projectName}")
+	private Project getProjectDetails(@PathVariable String projectName) {
+		return persistenceService.getProjectDetails(projectName);
+	}
+
+
 	@PostMapping("/createAPI")
-	private void createAPI(@RequestBody API api) {
-		persistenceService.createAPI(api);
+	private void createAPI(@RequestBody ApiDto apiDTO) {
+		persistenceService.createAPI(apiDTO);
+	}
+	
+	@GetMapping("/getApiByProjectId/{projectId}")
+	private List<API> getAPI(@PathVariable String projectId) {
+		return persistenceService.getAPI(projectId);
 	}
 	
 	/*

@@ -2,6 +2,10 @@ package com.mfsi.appbuilder.dto;
 
 import java.util.List;
 
+
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 
 public class ApiDto {
@@ -15,8 +19,17 @@ public class ApiDto {
 	private String apiUrl;
 	private String mainEntityName;
 	private String mainEntityIdType;
+	private List<ApiJsonTemplate> getParams;
 
 	
+	public List<ApiJsonTemplate> getGetParams() {
+		return getParams;
+	}
+
+	public void setGetParams(List<ApiJsonTemplate> getParams) {
+		this.getParams = getParams;
+	}
+
 	public String getProjectId() {
 		return projectId;
 	}
@@ -88,5 +101,13 @@ public class ApiDto {
 	public void setApiType(String apiType) {
 		this.apiType = apiType;
 	}
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return ToStringBuilder.reflectionToString(this,ToStringStyle.SHORT_PREFIX_STYLE);
+	}
+	
+	
 
 }
