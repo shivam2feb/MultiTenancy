@@ -1,21 +1,16 @@
 package com.mfsi.appbuilder.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.service.PersistenceService;
+import com.mfsi.appbuilder.util.AppBuilderUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/project")
@@ -25,14 +20,16 @@ public class ProjectController {
 	@Autowired
 	PersistenceService persistenceService;
 
-	@GetMapping("/byName/{userName}")
-	private List<Project> getProject(@PathVariable String userName) {
-		return persistenceService.getProject(userName);
+    @GetMapping("/byName")
+    private List<Project> getProject(Principal principal) {
+        return persistenceService.getProject(AppBuilderUtil.getLoggedInUserId());
 	}
 
 	@PostMapping("/create")
-	private void createProject(@RequestBody ProjectDTO projectDTO) {
+    private void createProject(@RequestBody ProjectDTO projectDTO, Principal principal) {
+        projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
 		persistenceService.saveProject(projectDTO);
+        //persistenceService.connectDB("","","");
 	}
 
 	@GetMapping("/getAll")

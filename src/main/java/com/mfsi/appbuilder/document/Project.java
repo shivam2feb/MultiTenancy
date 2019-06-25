@@ -1,15 +1,14 @@
 package com.mfsi.appbuilder.document;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.persistence.Id;
-
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.mfsi.appbuilder.dto.User;
+import javax.persistence.Id;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Document
 public class Project {
@@ -19,17 +18,17 @@ public class Project {
 	
 	private String projectName;
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
-	private LocalDateTime lastUpdatedOn;
-	private User user;
-	
-	
-	
-	public User getUser() {
-		return user;
-	}
+    @LastModifiedDate
+    private Date lastUpdatedOn;
+    private String userId;
 
-	public void setUser(User user) {
-		this.user = user;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
 	}
 
 	public String getId() {
@@ -56,11 +55,14 @@ public class Project {
 		this.apiInfo = apiInfo;
 	}
 
-	public LocalDateTime getLastUpdatedOn() {
-		return lastUpdatedOn;
+    public String getLastUpdatedOn() {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+
+        System.out.println(sdf.format(lastUpdatedOn));
+        return sdf.format(lastUpdatedOn);
 	}
-	
-	public void setLastUpdatedOn(LocalDateTime lastUpdatedOn) {
+
+    public void setLastUpdatedOn(Date lastUpdatedOn) {
 		this.lastUpdatedOn = lastUpdatedOn;
 	}
 	
