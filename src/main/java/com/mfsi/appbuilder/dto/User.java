@@ -1,14 +1,28 @@
 package com.mfsi.appbuilder.dto;
 
-public class User {
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
+
+public class User extends org.springframework.security.core.userdetails.User {
 	private String userId;
-	private String userName   ;
-	private String userDOB ;
-	public String getUserName() {
-		return userName;
-	}
-	
-	
+    private String token;
+
+    public User(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+        super(username, password, authorities);
+        this.userId = id;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+
+
 	public String getUserId() {
 		return userId;
 	}
@@ -19,25 +33,4 @@ public class User {
 	}
 
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	public String getUserDOB() {
-		return userDOB;
-	}
-	public void setUserDOB(String userDOB) {
-		this.userDOB = userDOB;
-	}
-	public User(String userId, String userName, String userDOB) {
-		super();
-		this.userId = userId;
-		this.userName = userName;
-		this.userDOB = userDOB;
-	}
-	public User() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-	
-	
 }
