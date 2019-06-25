@@ -1,37 +1,35 @@
 package com.mfsi.appbuilder.document;
 
-import javax.persistence.Id;
+import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.mfsi.appbuilder.model.ApiJsonTemplate;
+
 @Document
 public class API {
-
-	@Id
-	private String id=String.valueOf(System.nanoTime());
+	private String id;
 	private String apiName;
 	private String apiType;
-	private String jsonString;
-	private String projectID;
-	
-	
-	
-	public String getProjectID() {
-		return projectID;
+	private List<ApiJsonTemplate> jsonString;
+	private String projectName;
+	private String projectId;
+	private String apiUrl;
+	private String mainEntityName;
+	private String mainEntityIdType;
+	private List<ApiJsonTemplate> getParams;
+	public List<ApiJsonTemplate> getGetParams() {
+		return getParams;
 	}
-
-	public void setProjectID(String projectID) {
-		this.projectID = projectID;
+	public void setGetParams(List<ApiJsonTemplate> getParams) {
+		this.getParams = getParams;
 	}
-
+	public String getId() {
+		return id;
+	}
 	public void setId(String id) {
 		this.id = id;
 	}
-
-	public String getId() {
-		return this.id;
-	}
-	
 	public String getApiName() {
 		return apiName;
 	}
@@ -39,16 +37,45 @@ public class API {
 		this.apiName = apiName;
 	}
 	public String getApiType() {
-		return this.apiType;
+		return apiType;
 	}
 	public void setApiType(String apiType) {
-		this.apiType=apiType;
+		this.apiType = apiType;
 	}
-	
-	public String getJsonString() {
+	public List<ApiJsonTemplate> getJsonString() {
 		return jsonString;
 	}
-	public void setJsonString(String jsonString) {
+	public void setJsonString(List<ApiJsonTemplate> jsonString) {
 		this.jsonString = jsonString;
+	}
+	public String getProjectName() {
+		return projectName;
+	}
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+	public String getProjectId() {
+		return projectId;
+	}
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+	public String getApiUrl() {
+		return apiUrl;
+	}
+	public void setApiUrl(String apiUrl) {
+		this.apiUrl = apiUrl;
+	}
+	public String getMainEntityName() {
+		return mainEntityName;
+	}
+	public void setMainEntityName(String mainEntityName) {
+		this.mainEntityName = mainEntityName;
+	}
+	public String getMainEntityIdType() {
+		return mainEntityIdType;
+	}
+	public void setMainEntityIdType(String mainEntityIdType) {
+		this.mainEntityIdType = mainEntityIdType;
 	}
 }
