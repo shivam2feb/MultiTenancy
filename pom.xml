@@ -12,7 +12,7 @@
 	<groupId>com.java.appbuilder</groupId>
 	<artifactId>appbuilder</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>appbuilder</name> 
+	<name>appbuilder</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -34,6 +34,12 @@
 			<artifactId>derby</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

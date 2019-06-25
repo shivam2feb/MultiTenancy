@@ -31,8 +31,8 @@ public class AppBuilderApplication {
 	public static void prepareMap(Map<String,Object> map) {
 		List<Parameter> listOfParam=new ArrayList<>();
 		Parameter idParam= new Parameter();
-		idParam.setIsId(Boolean.TRUE);
-		idParam.setName("id");
+		idParam.setIsPrimaryKey(Boolean.TRUE);
+		idParam.setColumnName("id");
 		idParam.setDataType("Long");
 		idParam.setColumnName("ModelID");
 		listOfParam.add(idParam);
@@ -42,7 +42,7 @@ public class AppBuilderApplication {
 				param.setDataType("int");
 			else
 				param.setDataType("String");
-			param.setName("param"+i);
+			param.setColumnName("param"+i);
 			listOfParam.add(param);
 			if(Arrays.asList(1,2,4,9).contains(i)) {
 				param.setColumnName("Column_Name_"+i);

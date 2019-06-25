@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
-import com.mfsi.appbuilder.dto.APIDTO;
+import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.service.PersistenceService;
 
@@ -40,8 +40,22 @@ public class ProjectController {
 		return persistenceService.getAllProjects();
 	}
 	
+	@GetMapping("/getApis/{id}")
+	private List<API> getApiDetails(@PathVariable String id) {
+		return persistenceService.getAPI(id);
+	}
+	
+	
+	
+	
+	@GetMapping("/byProjectName/{projectName}")
+	private Project getProjectDetails(@PathVariable String projectName) {
+		return persistenceService.getProjectDetails(projectName);
+	}
+
+
 	@PostMapping("/createAPI")
-	private void createAPI(@RequestBody APIDTO apiDTO) {
+	private void createAPI(@RequestBody ApiDto apiDTO) {
 		persistenceService.createAPI(apiDTO);
 	}
 	
@@ -50,4 +64,9 @@ public class ProjectController {
 		return persistenceService.getAPI(projectId);
 	}
 	
+	/*
+	 * @GetMapping("/getApiByProjectId/{projectId}") private List<API>
+	 * getAPI(@PathVariable String projectId) { return
+	 * persistenceService.getAPI(projectId); }
+	 */
 }
