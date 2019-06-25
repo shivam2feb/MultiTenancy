@@ -1,35 +1,38 @@
 package com.mfsi.appbuilder.model;
 
-import javax.persistence.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "user")
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Document
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column
+    private String id;
+
     private String firstName;
-    @Column
+
     private String lastName;
-    @Column
+
     private String username;
-    @Column
+
     private String password;
-    @Column
+
     private long salary;
-    @Column
+
     private int age;
-    @Column
+
     private Boolean isEnabled;
 
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
