@@ -10,15 +10,14 @@ public class ProjectDTO {
 	private String projectName;
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
 	private LocalDateTime lastUpdatedOn;
-	private User user;
-	
-	
-	public User getUser() {
-		return user;
+	private String userId;
+
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getProjectName() {

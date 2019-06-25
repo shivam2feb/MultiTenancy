@@ -1,6 +1,5 @@
 package com.mfsi.appbuilder.document;
 
-import com.mfsi.appbuilder.dto.User;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -21,16 +20,15 @@ public class Project {
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
     @LastModifiedDate
     private Date lastUpdatedOn;
-	private User user;
-	
-	
-	
-	public User getUser() {
-		return user;
-	}
+    private String userId;
 
-	public void setUser(User user) {
-		this.user = user;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
 	}
 
 	public String getId() {
