@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +31,7 @@ import freemarker.template.Template;
 @Service
 public class AppServiceImpl implements AppService{
 
-	@Value("${templateSource}")
+	@Value("classpath:templateProject")
 	private String src;
 
 	@Value("${destinationSource}")
@@ -63,7 +63,14 @@ public class AppServiceImpl implements AppService{
 	}
 	
 	public boolean copyFolder(String srcPath, String dscPath) {
-		File srcFolder=new File(srcPath);
+		File srcFolder = null;
+		try {
+			srcFolder = new ClassPathResource("templateProject").getFile();
+			
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		File dscFolder=new File(dscPath);
 		try {
 			copyFolder(srcFolder,dscFolder);

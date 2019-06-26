@@ -36,7 +36,7 @@ public class AppController {
 	@Autowired
 	PersistenceService persistenceService;
 	
-	@Value("${templateSource}")
+	@Value("classpath:templateProject")
 	private String src;
 
 	@Value("${destinationSource}")
