@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
+import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
@@ -119,4 +120,10 @@ public class AppController {
 		return true;
 	}
 	
+
+	@PostMapping(value = "/getDBInfo")
+	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {
+		return persistenceService.getDBInfo(projectDTO);
+	}
+
 }
