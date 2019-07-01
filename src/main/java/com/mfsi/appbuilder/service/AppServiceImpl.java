@@ -44,6 +44,12 @@ public class AppServiceImpl implements AppService{
 	
 
 	
+	/**
+	 * used to make method name dynamically to be used in repository call for fetching data.
+	 * @author rohan
+	 * @param getParams - list of params.
+	 * @return string of method name to be used in repository call. 
+	 */
 	public String createMethodName(List<ApiJsonTemplate> getParams) {
 		StringBuilder methodName = new StringBuilder("");
 		int curr = 0;
@@ -68,7 +74,6 @@ public class AppServiceImpl implements AppService{
 			srcFolder = new ClassPathResource("templateProject").getFile();
 			
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		File dscFolder=new File(dscPath);
@@ -129,38 +134,44 @@ public class AppServiceImpl implements AppService{
 	}
 
 	
+	/**
+	 * Loop over freetext json to fetch out entities to be created dynamically.
+	 * @author rohan
+	 * @param List of Api json dto's
+	 * @return entities map 
+	 */
 	public Map<String,List<ApiJsonTemplate>> prepareEntitiesMap(List<ApiJsonTemplate> jsonString){
 		Map<String,List<ApiJsonTemplate>> entitiesMap = new HashMap<>();
 		
-		for (Iterator iterator = jsonString.iterator(); iterator.hasNext();) {
+		for (Iterator<ApiJsonTemplate> iterator = jsonString.iterator(); iterator.hasNext();) {
 			ApiJsonTemplate apiJsonTemplate = (ApiJsonTemplate) iterator.next();
 			prepareApiJsonTemplateObj(entitiesMap, apiJsonTemplate);	
 		}
-
-		ObjectMapper mapper = new ObjectMapper();
-		try {
-			System.out.println(mapper.writeValueAsString(entitiesMap));
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		return entitiesMap;
 	}
 	
-	public Map<String,List<ApiJsonTemplate>> prepareApiJsonTemplateObj(Map<String,List<ApiJsonTemplate>> map,ApiJsonTemplate apiJsonTemplate) {
+	/**
+	 * used to parse json and push it into entities map for making entities dynamically.
+	 * @author rohan
+	 * @param entitiesMap to be finally made.
+	 * @param apiJsonTemplate to be parsed.
+	 * @return final entitiesMap.
+	 */
+	public Map<String,List<ApiJsonTemplate>> prepareApiJsonTemplateObj(Map<String,List<ApiJsonTemplate>> entitiesMap,ApiJsonTemplate apiJsonTemplate) {
 		
 		//check whether the object is a simple attribute or a Has A relationship with diff entity.
 		if(apiJsonTemplate.getDataType().getClass().getSimpleName().equals("String")) {
 			String entityName = apiJsonTemplate.getEntityName();
-			if(map.get(entityName) == null || map.get(entityName).size() == 0) {
+			if(entitiesMap.get(entityName) == null || entitiesMap.get(entityName).size() == 0) {
 				// fetch the preList and then insert into in the the map
 				List<ApiJsonTemplate> newList = new ArrayList<>();
 				newList.add(apiJsonTemplate);
-				map.put(entityName, newList);
+				entitiesMap.put(entityName, newList);
 			}else {
-				List<ApiJsonTemplate> preList = map.get(entityName);
+				List<ApiJsonTemplate> preList = entitiesMap.get(entityName);
 				preList.add(apiJsonTemplate);
-				map.put(entityName, preList);
+				entitiesMap.put(entityName, preList);
 			}
 		}else {
 			//add it to list and send it to recursion.
@@ -168,25 +179,25 @@ public class AppServiceImpl implements AppService{
 			List<ApiJsonTemplate> nestedList = (List<ApiJsonTemplate>)apiJsonTemplate.getDataType();
 			
 			String entityName = apiJsonTemplate.getEntityName();
-			if(map.get(entityName) == null || map.get(entityName).size() == 0) {
+			if(entitiesMap.get(entityName) == null || entitiesMap.get(entityName).size() == 0) {
 				// fetch the preList and then insert into in the the map
 				List<ApiJsonTemplate> newList = new ArrayList<>();
 				apiJsonTemplate.setDataType(apiJsonTemplate.getColumnName().substring(0,1).toUpperCase()+apiJsonTemplate.getColumnName().substring(1));
 				newList.add(apiJsonTemplate);
-				map.put(entityName, newList);
+				entitiesMap.put(entityName, newList);
 			}else {
-				List<ApiJsonTemplate> preList = map.get(entityName);
+				List<ApiJsonTemplate> preList = entitiesMap.get(entityName);
 				apiJsonTemplate.setDataType(apiJsonTemplate.getColumnName().substring(0,1).toUpperCase()+apiJsonTemplate.getColumnName().substring(1));
 				preList.add(apiJsonTemplate);
-				map.put(entityName, preList);
+				entitiesMap.put(entityName, preList);
 			}
 
 			for (Iterator iterator = nestedList.iterator(); iterator.hasNext();) {
 				ApiJsonTemplate nestedApiJsonTemplate = mapper.convertValue(iterator.next(), ApiJsonTemplate.class);
-				prepareApiJsonTemplateObj(map, nestedApiJsonTemplate);
+				prepareApiJsonTemplateObj(entitiesMap, nestedApiJsonTemplate);
 			}	
 		}
-		return map;
+		return entitiesMap;
 	}
 	
 	
@@ -236,14 +247,23 @@ public class AppServiceImpl implements AppService{
 				BASE_PACKAGE+"service\\", modelName+"ServiceImpl");
 	}
 	
-	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> listOfMap,String src,String dest,API apiDto,String getApiMethodName) {
+	/**
+	 * used to create java files for project like entities, controller, service, repositories etc from templates and template values.
+	 * @author shivam, rohan
+	 * @param entitiesMap to be finally made.
+	 * @param src for source files.
+	 * @param dest for destination file location.
+	 * @param apiDto for current api to be made.
+	 * @param getApiMethodName if it is a get call then it is provided.
+	 */
+	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> entitiesMap,String src,String dest,API apiDto,String getApiMethodName) {
 		
-		Set<String> entities = listOfMap.keySet();
+		Set<String> entities = entitiesMap.keySet();
 		
 		// iterating over json string for fetching all entities.
 		for (String entityName : entities) {
 			Map<String,Object> entityMap=new HashMap<>();
-			entityMap.put("params", listOfMap.get(entityName));
+			entityMap.put("params", entitiesMap.get(entityName));
 			entityMap.put("tableName", entityName);
 			entityMap.put("EntityName", entityName);
 			entityMap.put("ApiName", apiDto.getApiName());
@@ -259,8 +279,7 @@ public class AppServiceImpl implements AppService{
 		entityMap.put("params", apiDto.getGetParams());
 		entityMap.put("MethodName", getApiMethodName);
 		
-		System.out.println(entityMap);
-		
+		// creating accordingly for each api type.
 		if(apiDto.getApiType().equalsIgnoreCase("post")) {
 		
 			generateFileFromTemplateV2(entityMap, "PostControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
@@ -301,27 +320,10 @@ public class AppServiceImpl implements AppService{
 					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
 			
 		}else if(apiDto.getApiType().equalsIgnoreCase("delete")) {
-			//TODO
+			//TODO for delete type api
 			
 		}
 		
-		/*
-		 * generateFileFromTemplate(listOfMap.get("entityMap"),
-		 * "EntityTemplate.ftl",dest+BASE_JAVA_FOLDER+
-		 * BASE_PACKAGE+"entity\\",modelName);
-		 * generateFileFromTemplate(listOfMap.get(GENERIC_MAP),
-		 * "ControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
-		 * BASE_PACKAGE+"controller\\", modelName+"Controller");
-		 * generateFileFromTemplate(listOfMap.get(GENERIC_MAP),
-		 * "RepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
-		 * BASE_PACKAGE+"repository\\", modelName+"Repository");
-		 * generateFileFromTemplate(listOfMap.get(GENERIC_MAP),
-		 * "ServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
-		 * BASE_PACKAGE+"service\\", modelName+"Service");
-		 * generateFileFromTemplate(listOfMap.get(GENERIC_MAP),
-		 * "ServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
-		 * BASE_PACKAGE+"service\\", modelName+"ServiceImpl");
-		 */
 	}
 	
 	public void compileProject(String fileLocation) {

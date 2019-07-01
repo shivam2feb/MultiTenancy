@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
@@ -42,14 +41,11 @@ public class AppController {
 	@Value("${destinationSource}")
 	private String destination;
 	
-	//private static final Logger logger =LoggerFactory.getLogger(AppController.class);
-	
 
 	@PostMapping(value="/model")
 	public void createProject(@RequestBody Model model) {
 		String dest=destination+"\\"+model.getApplicationName();
 		if(appService.copyFolder(src, dest)) {
-			//logger.info("Inside controller. Folder is copied to destination.");
 			String entityName=model.getModelName();
 			entityName=entityName.substring(0,1).toUpperCase()+entityName.substring(1);
 			model.setModelName(entityName);
@@ -58,45 +54,38 @@ public class AppController {
 		}
 	}
 	
+	/**
+	 * Used to download the projects to client machine.
+	 * @author rohan
+	 * @param projectId - takes project id to download all apis related to it.
+	 */
 	@GetMapping(value="/downloadProject/{projectId}")
 	public void downloadProject(@PathVariable String projectId) {
 		String getApiMethodName = "";
 		// fetch from db 
 		List<API> apis = persistenceService.getAPI(projectId);
-		ObjectMapper mapeer = new ObjectMapper();
 		
-		// loop on all apiDto
+		// loop on all apis
 		for (API api : apis) {
 			
-			try {
-				System.out.println(mapeer.writeValueAsString(api));
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			// for creating the repository method name like findBy"something"
 			if(api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
 			
 			String dest=destination+"\\"+api.getProjectName();
 			if(appService.copyFolder(src, dest)) {
-				Map<String, List<ApiJsonTemplate>> listOfMap=appService.prepareEntitiesMap(api.getJsonString());
-				appService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",api,getApiMethodName);
+				Map<String, List<ApiJsonTemplate>> entitiesMap=appService.prepareEntitiesMap(api.getJsonString());
+				appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMethodName);
 			}
 		}	
-	}
+	} 
 
 	@PostMapping(value="/createPojo")
 	public void generatePojo(@RequestBody String jsonObj) {
 		Map<String,Object> templateMap=new HashMap<>();
-		System.out.println("Json String is "+jsonObj);
-		ObjectMapper mapper=new ObjectMapper(); 
+	 
 		Map<String,Object> map=new HashMap<>();
-		try {
-			map=mapper.readValue(jsonObj, new TypeReference<Map<String,Object>>(){});
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		
 		List<Parameter> listOfParam=new ArrayList<>();
 		
 		Parameter param1 = new Parameter();
@@ -113,7 +102,6 @@ public class AppController {
 			param.setColumnName(entrySet.getKey());
 			listOfParam.add(param);
 		}
-		//generatePojo(templateMap,"");
 	}
 	
 	@PostMapping("/createProject1")
@@ -131,21 +119,4 @@ public class AppController {
 		return true;
 	}
 	
-	
-	/*
-	 * @GetMapping("/createProject1") public boolean createProject1(@RequestBody
-	 * String jsonString) { ObjectMapper mapper=new ObjectMapper();
-	 * Map<String,Object> jsonObject=new HashMap<>(); try {
-	 * mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
-	 * }catch(Exception e) {
-	 * //logger.error("Error while parsing the the JSON String {}",e);
-	 * e.printStackTrace(); } System.out.println(jsonObject.get("proojectName"));
-	 * //persistenceService.saveProject("MyProject"); return true; }
-	 */
-	
-	/*
-	 * @GetMapping("/getProject/{projectId}") public Project
-	 * getProject(@PathVariable(name="projectId") int id) { return
-	 * persistenceService.getProject(id); }
-	 */
 }
