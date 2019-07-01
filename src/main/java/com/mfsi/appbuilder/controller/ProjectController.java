@@ -26,10 +26,14 @@ public class ProjectController {
 	}
 
 	@PostMapping("/create")
-    private void createProject(@RequestBody ProjectDTO projectDTO, Principal principal) {
+	private Project createProject(@RequestBody ProjectDTO projectDTO, Principal principal) throws Exception {
         projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
-		persistenceService.saveProject(projectDTO);
-        //persistenceService.connectDB("","","");
+		if (persistenceService.getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername()
+				, projectDTO.getDbPassword()) == null)
+			projectDTO.setVerified(false);
+		else
+			projectDTO.setVerified(true);
+		return persistenceService.saveProject(projectDTO);
 	}
 
 	@GetMapping("/getAll")
