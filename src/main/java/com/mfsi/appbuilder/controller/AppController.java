@@ -1,6 +1,5 @@
 package com.mfsi.appbuilder.controller;
 
-import java.util.ArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -13,15 +12,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletResponse;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,16 +31,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
+import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
 import com.mfsi.appbuilder.service.PersistenceService;
-
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -49,60 +47,48 @@ public class AppController {
 
 	@Autowired
 	AppService appService;
-	
 
 	@Autowired
 	PersistenceService persistenceService;
 
-
-
-	@Value("${templateSource}")
+	@Value("classpath:templateProject")
 	private String src;
 
 	@Value("${destinationSource}")
 	private String destination;
 
-	private String  dest = new String();
+	private String dest = new String();
 
 	private String projectName = new String();
 
-	//private static final Logger logger =LoggerFactory.getLogger(AppController.class);
-
-
-	@PostMapping(value="/model")
+	@PostMapping(value = "/model")
 	public void createProject(@RequestBody Model model) {
-		String dest=destination+"\\"+model.getApplicationName();
-		if(appService.copyFolder(src, dest)) {
-			//logger.info("Inside controller. Folder is copied to destination.");
-			String entityName=model.getModelName();
-			entityName=entityName.substring(0,1).toUpperCase()+entityName.substring(1);
+		String dest = destination + "\\" + model.getApplicationName();
+		if (appService.copyFolder(src, dest)) {
+			String entityName = model.getModelName();
+			entityName = entityName.substring(0, 1).toUpperCase() + entityName.substring(1);
 			model.setModelName(entityName);
-			Map<String,Map<String,Object>> listOfMap=appService.prepareMapForTemplate(model);
-			appService.generateFilesFromTemplate(listOfMap,model,src,dest+"\\");
+			Map<String, Map<String, Object>> listOfMap = appService.prepareMapForTemplate(model);
+			appService.generateFilesFromTemplate(listOfMap, model, src, dest + "\\");
 		}
 	}
 
-	
+	/**
+	 * Used to download the projects to client machine.
+	 * @author rohan
+	 * @param projectId - takes project id to download all apis related to it.
+	 */
 	@GetMapping(value="/downloadProject/{projectId}")
 	public void downloadProject(@PathVariable String projectId,HttpServletResponse response) {
 		String getApiMethodName = "";
 		
-		ZipOutputStream zos;
 		// fetch from db 
 		List<API> apis = persistenceService.getAPI(projectId);
-		ObjectMapper mapeer = new ObjectMapper();
 		
-
-		// loop on all apiDto
+		// loop on all apis
 		for (API api : apis) {
 			
-			try {
-				System.out.println(mapeer.writeValueAsString(api));
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			// for creating the repository method name like findBy"something"
 			if(api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
 			
@@ -112,11 +98,12 @@ public class AppController {
 			this.dest = dest;
 
 			if(appService.copyFolder(src, dest)) {
-				Map<String, List<ApiJsonTemplate>> listOfMap=appService.prepareEntitiesMap(api.getJsonString());
-				appService.generateFilesFromTemplateV2(listOfMap,src,dest+"\\",api,getApiMethodName);
 
-			}
-		}
+Map<String, List<ApiJsonTemplate>> entitiesMap=appService.prepareEntitiesMap(api.getJsonString());
+appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMethodName);
+}
+}	
+
 
 
 		// Use the following paths for windows
@@ -151,21 +138,14 @@ public class AppController {
 		this.recursiveDelete(new File(folder));
 		
 		this.recursiveDelete(new File(this.dest + ".zip"));
-
-
 	}
 
 	@PostMapping(value="/createPojo")
 	public void generatePojo(@RequestBody String jsonObj) {
 		Map<String,Object> templateMap=new HashMap<>();
-		//System.out.println("Json String is "+jsonObj);
-		ObjectMapper mapper=new ObjectMapper(); 
+
 		Map<String,Object> map=new HashMap<>();
-		try {
-			map=mapper.readValue(jsonObj, new TypeReference<Map<String,Object>>(){});
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		
 		List<Parameter> listOfParam=new ArrayList<>();
 
 		Parameter param1 = new Parameter();
@@ -182,26 +162,26 @@ public class AppController {
 			param.setColumnName(entrySet.getKey());
 			listOfParam.add(param);
 		}
-		//generatePojo(templateMap,"");
 	}
 
 	@PostMapping("/createProject1")
 	public boolean createProject1(@RequestBody String jsonString) {
-		ObjectMapper mapper=new ObjectMapper();
-		Map<String,Object> jsonObject=new HashMap<>();
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String, Object> jsonObject = new HashMap<>();
 		try {
-			mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
-		}catch(Exception e) {
-			//logger.error("Error while parsing the the JSON String {}",e);
+			mapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {
+			});
+		} catch (Exception e) {
+			// logger.error("Error while parsing the the JSON String {}",e);
 			e.printStackTrace();
 		}
-		//System.out.println(jsonObject.get("proojectName"));
-		//persistenceService.saveProject("MyProject");
+		// System.out.println(jsonObject.get("proojectName"));
+		// persistenceService.saveProject("MyProject");
 		return true;
 	}
 
-	private void zipFolder(Path sourceFolderPath, Path zipPath){
-		try(ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()));){
+	private void zipFolder(Path sourceFolderPath, Path zipPath) {
+		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()));) {
 			Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 					zos.putNextEntry(new ZipEntry(sourceFolderPath.relativize(file).toString()));
@@ -210,44 +190,32 @@ public class AppController {
 					return FileVisitResult.CONTINUE;
 				}
 			});
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void recursiveDelete(File file) {
-		//to end the recursive loop
+		// to end the recursive loop
 		if (!file.exists())
 			return;
 
-		//if directory, go inside and call recursively
+		// if directory, go inside and call recursively
 		if (file.isDirectory()) {
 			for (File f : file.listFiles()) {
-				//call recursively
+				// call recursively
 				recursiveDelete(f);
 			}
 		}
-		//call delete to delete files and empty directory
-		//System.out.println("Deleted file/folder: "+file.getAbsolutePath());
+		// call delete to delete files and empty directory
+		// System.out.println("Deleted file/folder: "+file.getAbsolutePath());
 
 		file.delete();
 	}
 
+	@PostMapping(value = "/getDBInfo")
+	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {
+		return persistenceService.getDBInfo(projectDTO);
+	}
 
-	/*
-	 * @GetMapping("/createProject1") public boolean createProject1(@RequestBody
-	 * String jsonString) { ObjectMapper mapper=new ObjectMapper();
-	 * Map<String,Object> jsonObject=new HashMap<>(); try {
-	 * mapper.readValue(jsonString, new TypeReference<Map<String,Object>>(){});
-	 * }catch(Exception e) {
-	 * //logger.error("Error while parsing the the JSON String {}",e);
-	 * e.printStackTrace(); } System.out.println(jsonObject.get("proojectName"));
-	 * //persistenceService.saveProject("MyProject"); return true; }
-	 */
-
-	/*
-	 * @GetMapping("/getProject/{projectId}") public Project
-	 * getProject(@PathVariable(name="projectId") int id) { return
-	 * persistenceService.getProject(id); }
-	 */
 }

@@ -1,21 +1,16 @@
 package com.mfsi.appbuilder.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.service.PersistenceService;
+import com.mfsi.appbuilder.util.AppBuilderUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/project")
@@ -23,50 +18,46 @@ import com.mfsi.appbuilder.service.PersistenceService;
 public class ProjectController {
 
 	@Autowired
-	PersistenceService persistenceService;
+	private PersistenceService persistenceService;
 
-	@GetMapping("/byName/{userName}")
-	private List<Project> getProject(@PathVariable String userName) {
-		return persistenceService.getProject(userName);
+	@GetMapping("/byName")
+	public List<Project> getProject(Principal principal) {
+		return persistenceService.getProject(AppBuilderUtil.getLoggedInUserId());
 	}
 
 	@PostMapping("/create")
-	private void createProject(@RequestBody ProjectDTO projectDTO) {
-		persistenceService.saveProject(projectDTO);
+	private Project createProject(@RequestBody ProjectDTO projectDTO, Principal principal) throws Exception {
+        projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
+		if (persistenceService.getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername()
+				, projectDTO.getDbPassword()) == null)
+			projectDTO.setVerified(false);
+		else
+			projectDTO.setVerified(true);
+		return persistenceService.saveProject(projectDTO);
 	}
 
 	@GetMapping("/getAll")
-	private List<Project> getAllProjects() {
+	public List<Project> getAllProjects() {
 		return persistenceService.getAllProjects();
 	}
-	
+
 	@GetMapping("/getApis/{id}")
-	private List<API> getApiDetails(@PathVariable String id) {
+	public List<API> getApiDetails(@PathVariable String id) {
 		return persistenceService.getAPI(id);
 	}
-	
-	
-	
-	
+
 	@GetMapping("/byProjectName/{projectName}")
-	private Project getProjectDetails(@PathVariable String projectName) {
+	public Project getProjectDetails(@PathVariable String projectName) {
 		return persistenceService.getProjectDetails(projectName);
 	}
 
-
 	@PostMapping("/createAPI")
-	private void createAPI(@RequestBody ApiDto apiDTO) {
+	public void createAPI(@RequestBody ApiDto apiDTO) {
 		persistenceService.createAPI(apiDTO);
 	}
-	
+
 	@GetMapping("/getApiByProjectId/{projectId}")
-	private List<API> getAPI(@PathVariable String projectId) {
+	public List<API> getAPI(@PathVariable String projectId) {
 		return persistenceService.getAPI(projectId);
 	}
-	
-	/*
-	 * @GetMapping("/getApiByProjectId/{projectId}") private List<API>
-	 * getAPI(@PathVariable String projectId) { return
-	 * persistenceService.getAPI(projectId); }
-	 */
 }

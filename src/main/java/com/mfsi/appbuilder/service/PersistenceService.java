@@ -1,19 +1,24 @@
 package com.mfsi.appbuilder.service;
 
-import java.util.List;
-
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 
+import java.sql.Connection;
+import java.util.List;
+import java.util.Map;
+
 public interface PersistenceService {
 
-	public void saveProject(ProjectDTO projectDTO);
+	public Project saveProject(ProjectDTO projectDTO);
 	public List<Project> getProject(String projectName);
 	public List<Project> getAllProjects();
 	public void createAPI(ApiDto api);
 	public List<API> getAPI(String projectId);
-	public List<Project> getProjects(String userName);
 	public Project getProjectDetails(String projectId);
+
+	public Map<String, List<String>> getDBInfo(ProjectDTO projectDTO);
+
+	public Connection getMySqlConnection(String url, String username, String password) throws Exception;
 }
