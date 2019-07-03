@@ -18,11 +18,11 @@ import java.util.List;
 public class ProjectController {
 
 	@Autowired
-	PersistenceService persistenceService;
+	private PersistenceService persistenceService;
 
-    @GetMapping("/byName")
-    private List<Project> getProject(Principal principal) {
-        return persistenceService.getProject(AppBuilderUtil.getLoggedInUserId());
+	@GetMapping("/byName")
+	public List<Project> getProject(Principal principal) {
+		return persistenceService.getProject(AppBuilderUtil.getLoggedInUserId());
 	}
 
 	@PostMapping("/create")
@@ -37,37 +37,27 @@ public class ProjectController {
 	}
 
 	@GetMapping("/getAll")
-	private List<Project> getAllProjects() {
+	public List<Project> getAllProjects() {
 		return persistenceService.getAllProjects();
 	}
-	
+
 	@GetMapping("/getApis/{id}")
-	private List<API> getApiDetails(@PathVariable String id) {
+	public List<API> getApiDetails(@PathVariable String id) {
 		return persistenceService.getAPI(id);
 	}
-	
-	
-	
-	
+
 	@GetMapping("/byProjectName/{projectName}")
-	private Project getProjectDetails(@PathVariable String projectName) {
+	public Project getProjectDetails(@PathVariable String projectName) {
 		return persistenceService.getProjectDetails(projectName);
 	}
 
-
 	@PostMapping("/createAPI")
-	private void createAPI(@RequestBody ApiDto apiDTO) {
+	public void createAPI(@RequestBody ApiDto apiDTO) {
 		persistenceService.createAPI(apiDTO);
 	}
-	
+
 	@GetMapping("/getApiByProjectId/{projectId}")
-	private List<API> getAPI(@PathVariable String projectId) {
+	public List<API> getAPI(@PathVariable String projectId) {
 		return persistenceService.getAPI(projectId);
 	}
-	
-	/*
-	 * @GetMapping("/getApiByProjectId/{projectId}") private List<API>
-	 * getAPI(@PathVariable String projectId) { return
-	 * persistenceService.getAPI(projectId); }
-	 */
 }

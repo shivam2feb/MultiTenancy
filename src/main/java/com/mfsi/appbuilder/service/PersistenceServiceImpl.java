@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,8 +54,6 @@ public class PersistenceServiceImpl implements PersistenceService{
 
 	@Override
 	public void createAPI(ApiDto apiDTO) {
-		// TODO Auto-generated method stub
-		//System.out.println(apiDTO);
 		API api = new API();
 		api.setApiName(apiDTO.getApiName());
 		api.setApiType(apiDTO.getApiType());
@@ -72,7 +71,6 @@ public class PersistenceServiceImpl implements PersistenceService{
 
 	@Override
 	public Project getProjectDetails(String projectId) {
-		// TODO Auto-generated method stub
 		return projectRepository.findProjectById(projectId);
 	}
 
@@ -96,24 +94,26 @@ public class PersistenceServiceImpl implements PersistenceService{
 					metaData.put(resultSet.getString(3), columns);
 				}
 			}
-		} catch (Exception e) {
-
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return metaData;
 	}
 
 	@Override
-	public Connection getMySqlConnection(String url, String username, String password) throws Exception {
+	public Connection getMySqlConnection(String url, String username, String password) {
 		String driver = "com.mysql.jdbc.Driver";
 //		url = "jdbc:mysql://localhost:3306/ems_dev";
 //		username = "root";
 //		password = "root";
 		Connection conn = null;
-		Class.forName(driver);
 		try {
+			Class.forName(driver);
 			conn = DriverManager.getConnection(url, username, password);
-		} catch (Exception e) {
-
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 
 		return conn;
