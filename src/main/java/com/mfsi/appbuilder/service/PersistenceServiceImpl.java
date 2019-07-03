@@ -64,6 +64,7 @@ public class PersistenceServiceImpl implements PersistenceService{
 		api.setMainEntityName(apiDTO.getMainEntityName());
 		api.setApiUrl(apiDTO.getApiUrl());
 		api.setGetParams(apiDTO.getGetParams());
+		api.setReJson(apiDTO.getReJson());
 		apiRepository.save(api);
 	}
 	
@@ -117,5 +118,11 @@ public class PersistenceServiceImpl implements PersistenceService{
 		}
 
 		return conn;
+	}
+
+	@Override
+	public void deleteApi(String apiId) {
+		// TODO Auto-generated method stub
+		apiRepository.deleteById(apiId);
 	}
 }

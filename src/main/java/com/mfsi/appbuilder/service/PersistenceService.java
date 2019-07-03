@@ -15,6 +15,8 @@ public interface PersistenceService {
 	public List<Project> getProject(String projectName);
 	public List<Project> getAllProjects();
 	public void createAPI(ApiDto api);
+	
+	public void deleteApi(String apiId);
 	public List<API> getAPI(String projectId);
 	public Project getProjectDetails(String projectId);
 
