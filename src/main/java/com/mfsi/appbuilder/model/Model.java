@@ -11,6 +11,9 @@ public class Model {
 	private String tableName;
 	private List<Parameter> parameterList;
 	
+	
+	
+
 	public String getApplicationName() {
 		return applicationName;
 	}
