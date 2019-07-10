@@ -75,58 +75,55 @@ public class AppController {
 
 	/**
 	 * Used to download the projects to client machine.
+	 * 
 	 * @author rohan
 	 * @param projectId - takes project id to download all apis related to it.
 	 */
-	@GetMapping(value="/downloadProject/{projectId}")
-	public void downloadProject(@PathVariable String projectId,HttpServletResponse response) {
+	@GetMapping(value = "/downloadProject/{projectId}")
+	public void downloadProject(@PathVariable String projectId, HttpServletResponse response) {
 		String getApiMethodName = "";
-		
-		// fetch from db 
+
+		// fetch from db
 		List<API> apis = persistenceService.getAPI(projectId);
-		
+
 		// loop on all apis
 		for (API api : apis) {
-			
+
 			// for creating the repository method name like findBy"something"
-			if(api.getApiType().equalsIgnoreCase("get"))
+			if (api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
-			
-			String dest=destination+"\\"+api.getProjectName();
+
+			String dest = destination + File.separator + api.getProjectName();
 
 			this.projectName = api.getProjectName();
 			this.dest = dest;
 
-			if(appService.copyFolder(src, dest)) {
+			if (appService.copyFolder(src, dest)) {
 
-Map<String, List<ApiJsonTemplate>> entitiesMap=appService.prepareEntitiesMap(api.getJsonString());
-appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMethodName);
-}
-}	
-
-
+				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
+				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
+			}
+		}
 
 		// Use the following paths for windows
-		//String folderToZip = "c:\\demo\\test";
-		//String zipName = "c:\\demo\\test.zip";
+		// String folderToZip = "c:\\demo\\test";
+		// String zipName = "c:\\demo\\test.zip";
 
 		// Linux/mac paths
 		String folderToZip = this.dest;
 		String zipName = this.dest + ".zip";
-		File file= new File(this.dest + ".zip");
+		File file = new File(this.dest + ".zip");
 
 		this.zipFolder(Paths.get(folderToZip), Paths.get(zipName));
-		try(InputStream is=new FileInputStream(file);
-			OutputStream out=response.getOutputStream();) {
+		try (InputStream is = new FileInputStream(file); OutputStream out = response.getOutputStream();) {
 
-			byte[] buffer=new byte[1024];
-			int bytesRead=-1;
+			byte[] buffer = new byte[1024];
+			int bytesRead = -1;
 			response.setContentType("application/zip");
-			response.addHeader("Content-Disposition", "attachment; filename="+this.projectName+".zip");
-			while((bytesRead=is.read(buffer))!=-1) {
+			response.addHeader("Content-Disposition", "attachment; filename=" + this.projectName + ".zip");
+			while ((bytesRead = is.read(buffer)) != -1) {
 				out.write(buffer, 0, bytesRead);
 			}
-
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -134,19 +131,19 @@ appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMetho
 		}
 
 		String folder = this.dest;
-		//delete folder recursively
+		// delete folder recursively
 		this.recursiveDelete(new File(folder));
-		
+
 		this.recursiveDelete(new File(this.dest + ".zip"));
 	}
 
-	@PostMapping(value="/createPojo")
+	@PostMapping(value = "/createPojo")
 	public void generatePojo(@RequestBody String jsonObj) {
-		Map<String,Object> templateMap=new HashMap<>();
+		Map<String, Object> templateMap = new HashMap<>();
 
-		Map<String,Object> map=new HashMap<>();
-		
-		List<Parameter> listOfParam=new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+
+		List<Parameter> listOfParam = new ArrayList<>();
 
 		Parameter param1 = new Parameter();
 		param1.setDataType("Long");
@@ -156,8 +153,8 @@ appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMetho
 		templateMap.put("params", listOfParam);
 		templateMap.put("EntityName", "Model");
 
-		for(Entry<String, Object> entrySet:map.entrySet()) {
-			Parameter param= new Parameter();
+		for (Entry<String, Object> entrySet : map.entrySet()) {
+			Parameter param = new Parameter();
 			param.setDataType(entrySet.getValue().getClass().getSimpleName());
 			param.setColumnName(entrySet.getKey());
 			listOfParam.add(param);

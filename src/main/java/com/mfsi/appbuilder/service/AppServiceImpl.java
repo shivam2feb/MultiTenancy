@@ -37,8 +37,8 @@ public class AppServiceImpl implements AppService{
 	private String dest;
 
 	static final String GENERIC_MAP="genericMap";
-	static final String BASE_JAVA_FOLDER="src\\main\\java\\";
-	static final String BASE_PACKAGE="com\\app\\";
+	static final String BASE_JAVA_FOLDER="src"+File.separator+"main"+File.separator+"java"+File.separator;
+	static final String BASE_PACKAGE="com"+File.separator+"app"+File.separator;
 	
 	
 
@@ -280,45 +280,36 @@ public class AppServiceImpl implements AppService{
 		entityMap.put("params", apiDto.getGetParams());
 		entityMap.put("MethodName", getApiMethodName);
 		
+		
+		String destinationPath = dest+BASE_JAVA_FOLDER+
+				BASE_PACKAGE+apiDto.getApiName();
+		
 		// creating accordingly for each api type.
 		if(apiDto.getApiType().equalsIgnoreCase("post")) {
-		
-			generateFileFromTemplateV2(entityMap, "PostControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"controller\\", apiDto.getApiName()+"Controller");
 			
+			generateFileFromTemplateV2(entityMap, "PostControllerTemplate.ftl",destinationPath+"\\"+"controller\\", apiDto.getApiName()+"Controller");
 			
-			generateFileFromTemplateV2(entityMap, "PostServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"Service");
-			generateFileFromTemplateV2(entityMap, "PostServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
+			generateFileFromTemplateV2(entityMap, "PostServiceTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"Service");
+			generateFileFromTemplateV2(entityMap, "PostServiceImplTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
 			
-			generateFileFromTemplateV2(entityMap, "PostRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
+			generateFileFromTemplateV2(entityMap, "PostRepositoryTemplate.ftl",destinationPath+"\\"+"repository\\", apiDto.getApiName()+"Repository");
 		}else if(apiDto.getApiType().equalsIgnoreCase("put")) {
-			generateFileFromTemplateV2(entityMap, "PutControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"controller\\", apiDto.getApiName()+"Controller");
+			generateFileFromTemplateV2(entityMap, "PutControllerTemplate.ftl",destinationPath+"\\"+"controller\\", apiDto.getApiName()+"Controller");
 			
 			
-			generateFileFromTemplateV2(entityMap, "PutServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"Service");
-			generateFileFromTemplateV2(entityMap, "PutServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
+			generateFileFromTemplateV2(entityMap, "PutServiceTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"Service");
+			generateFileFromTemplateV2(entityMap, "PutServiceImplTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
 			
-			generateFileFromTemplateV2(entityMap, "PutRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
+			generateFileFromTemplateV2(entityMap, "PutRepositoryTemplate.ftl",destinationPath+"\\"+"repository\\", apiDto.getApiName()+"Repository");
 			
 		}else if(apiDto.getApiType().equalsIgnoreCase("get")) {
-			generateFileFromTemplateV2(entityMap, "GetControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"controller\\", apiDto.getApiName()+"Controller");
+			generateFileFromTemplateV2(entityMap, "GetControllerTemplate.ftl",destinationPath+"\\"+"controller\\", apiDto.getApiName()+"Controller");
 			
 			
-			generateFileFromTemplateV2(entityMap, "GetServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"Service");
-			generateFileFromTemplateV2(entityMap, "GetServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
+			generateFileFromTemplateV2(entityMap, "GetServiceTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"Service");
+			generateFileFromTemplateV2(entityMap, "GetServiceImplTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
 			
-			generateFileFromTemplateV2(entityMap, "GetRepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"repository\\", apiDto.getApiName()+"Repository");
+			generateFileFromTemplateV2(entityMap, "GetRepositoryTemplate.ftl",destinationPath+"\\"+"repository\\", apiDto.getApiName()+"Repository");
 			
 		}else if(apiDto.getApiType().equalsIgnoreCase("delete")) {
 			//TODO for delete type api
