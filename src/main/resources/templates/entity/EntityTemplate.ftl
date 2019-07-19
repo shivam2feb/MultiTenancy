@@ -2,7 +2,7 @@ package com.app.${ApiName}.entity;
 
 import java.util.*;
 import javax.persistence.*;
-import com.app.entity.*;
+import com.app.${ApiName}.entity.*;
 
 <#assign EntityName = "${EntityName?cap_first}">
 @Entity<#if tableName??>(name="${tableName}")</#if>

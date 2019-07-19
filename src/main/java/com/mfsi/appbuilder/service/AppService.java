@@ -17,4 +17,6 @@ public interface AppService {
 	public void compileProject(String fileLocation);
 	public Map<String, List<ApiJsonTemplate>> prepareEntitiesMap(List<ApiJsonTemplate> jsonString);
 	public String createMethodName(List<ApiJsonTemplate> getParams);
+	public void generateFileFromTemplateV2(Map<String, Object> map, String templateType, String templateName,
+			String location, String fileName,String fileExt);
 }

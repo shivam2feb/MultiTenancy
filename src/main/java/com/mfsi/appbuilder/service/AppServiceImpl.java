@@ -28,7 +28,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @Service
-public class AppServiceImpl implements AppService{
+public class AppServiceImpl implements AppService {
 
 	@Value("classpath:templateProject")
 	private String src;
@@ -36,157 +36,166 @@ public class AppServiceImpl implements AppService{
 	@Value("${destinationSource}")
 	private String dest;
 
-	static final String GENERIC_MAP="genericMap";
-	static final String BASE_JAVA_FOLDER="src"+File.separator+"main"+File.separator+"java"+File.separator;
-	static final String BASE_PACKAGE="com"+File.separator+"app"+File.separator;
-	
-	
+	public static final String GENERIC_MAP = "genericMap";
+	public static final String BASE_FOLDER = "src" + File.separator + "main" + File.separator;
+	public static final String BASE_JAVA_FOLDER = BASE_FOLDER + "java" + File.separator;
+	public static final String BASE_RESOURCES_FOLDER = BASE_FOLDER + "resources" + File.separator;
+	public static final String BASE_PACKAGE = "com" + File.separator + "app" + File.separator;
 
-	
 	/**
-	 * used to make method name dynamically to be used in repository call for fetching data.
+	 * used to make method name dynamically to be used in repository call for
+	 * fetching data.
+	 * 
 	 * @author rohan
 	 * @param getParams - list of params.
-	 * @return string of method name to be used in repository call. 
+	 * @return string of method name to be used in repository call.
 	 */
 	public String createMethodName(List<ApiJsonTemplate> getParams) {
 		StringBuilder methodName = new StringBuilder("");
 		int curr = 0;
 		for (ApiJsonTemplate param : getParams) {
-			
-			if(param.getRelationship().equalsIgnoreCase("default"))	
+
+			if (param.getRelationship().equalsIgnoreCase("default"))
 				methodName.append(param.getColumnName());
 			else
 				methodName.append(param.getEntityName()).append(param.getColumnName());
-			
-			if(curr != getParams.size()-1) methodName.append("And");
-			
+
+			if (curr != getParams.size() - 1)
+				methodName.append("And");
+
 			curr++;
 		}
-		
+
 		return methodName.toString();
 	}
-	
+
 	public boolean copyFolder(String srcPath, String dscPath) {
 		File srcFolder = null;
 		try {
 			srcFolder = new ClassPathResource("templateProject").getFile();
-			
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		File dscFolder=new File(dscPath);
+		File dscFolder = new File(dscPath);
 		try {
-			copyFolder(srcFolder,dscFolder);
-			//System.out.println("Folder is copied");
+			copyFolder(srcFolder, dscFolder);
+			// System.out.println("Folder is copied");
 			return true;
-		}catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
 	}
 
-	public void copyFolder(File src,File dest) throws IOException {
+	public void copyFolder(File src, File dest) throws IOException {
 
-		if(src.isDirectory()) {
-			if(!dest.exists()) {
+		if (src.isDirectory()) {
+			if (!dest.exists()) {
 				dest.mkdirs();
-				//System.out.println("Directory is created having path "+dest.getAbsolutePath());
+				// System.out.println("Directory is created having path
+				// "+dest.getAbsolutePath());
 			}
-			String[] files=src.list();
-			for(String file:files) {
-				File srcFile=new File(src,file);
-				File destFile=new File(dest,file);
-				copyFolder(srcFile,destFile);
+			String[] files = src.list();
+			for (String file : files) {
+				File srcFile = new File(src, file);
+				File destFile = new File(dest, file);
+				copyFolder(srcFile, destFile);
 			}
-		}else {
-			InputStream is=new FileInputStream(src);
-			OutputStream out=new FileOutputStream(dest);
-			byte[] buffer=new byte[1024];
+		} else {
+			InputStream is = new FileInputStream(src);
+			OutputStream out = new FileOutputStream(dest);
+			byte[] buffer = new byte[1024];
 			int length;
-			while((length=is.read(buffer))>0) {
+			while ((length = is.read(buffer)) > 0) {
 				out.write(buffer, 0, length);
 			}
 			is.close();
 			out.close();
-			
-			System.out.println("File copied from "+src+ " to "+dest);
+
+			System.out.println("File copied from " + src + " to " + dest);
 		}
 	}
 
-	public Map<String,Map<String, Object>> prepareMapForTemplate(Model model){
-		Map<String,Map<String,Object>> mapsOfTemplate=new HashMap<>();
-		Map<String,Object> entityMap=new HashMap<>();
+	public Map<String, Map<String, Object>> prepareMapForTemplate(Model model) {
+		Map<String, Map<String, Object>> mapsOfTemplate = new HashMap<>();
+		Map<String, Object> entityMap = new HashMap<>();
 		entityMap.put("params", model.getParameterList());
 		entityMap.put("tableName", model.getTableName());
 		entityMap.put("EntityName", model.getModelName());
 		mapsOfTemplate.put("entityMap", entityMap);
-		Map<String,Object> genericMap=new HashMap<>();
+		Map<String, Object> genericMap = new HashMap<>();
 		genericMap.put("EntityName", model.getModelName());
-		model.getParameterList().forEach(parameter->{
-			if(parameter.getIsPrimaryKey()) {
-				genericMap.put("idType",parameter.getDataType());
+		model.getParameterList().forEach(parameter -> {
+			if (parameter.getIsPrimaryKey()) {
+				genericMap.put("idType", parameter.getDataType());
 			}
 		});
 		mapsOfTemplate.put("genericMap", genericMap);
 		return mapsOfTemplate;
 	}
 
-	
 	/**
 	 * Loop over freetext json to fetch out entities to be created dynamically.
+	 * 
 	 * @author rohan
 	 * @param List of Api json dto's
-	 * @return entities map 
+	 * @return entities map
 	 */
-	public Map<String,List<ApiJsonTemplate>> prepareEntitiesMap(List<ApiJsonTemplate> jsonString){
-		Map<String,List<ApiJsonTemplate>> entitiesMap = new HashMap<>();
-		
+	public Map<String, List<ApiJsonTemplate>> prepareEntitiesMap(List<ApiJsonTemplate> jsonString) {
+		Map<String, List<ApiJsonTemplate>> entitiesMap = new HashMap<>();
+
 		for (Iterator<ApiJsonTemplate> iterator = jsonString.iterator(); iterator.hasNext();) {
 			ApiJsonTemplate apiJsonTemplate = (ApiJsonTemplate) iterator.next();
-			prepareApiJsonTemplateObj(entitiesMap, apiJsonTemplate);	
+			prepareApiJsonTemplateObj(entitiesMap, apiJsonTemplate);
 		}
 
 		return entitiesMap;
 	}
-	
+
 	/**
-	 * used to parse json and push it into entities map for making entities dynamically.
+	 * used to parse json and push it into entities map for making entities
+	 * dynamically.
+	 * 
 	 * @author rohan
-	 * @param entitiesMap to be finally made.
+	 * @param entitiesMap     to be finally made.
 	 * @param apiJsonTemplate to be parsed.
 	 * @return final entitiesMap.
 	 */
-	public Map<String,List<ApiJsonTemplate>> prepareApiJsonTemplateObj(Map<String,List<ApiJsonTemplate>> entitiesMap,ApiJsonTemplate apiJsonTemplate) {
-		
-		//check whether the object is a simple attribute or a Has A relationship with diff entity.
-		if(apiJsonTemplate.getDataType().getClass().getSimpleName().equals("String")) {
+	public Map<String, List<ApiJsonTemplate>> prepareApiJsonTemplateObj(Map<String, List<ApiJsonTemplate>> entitiesMap,
+			ApiJsonTemplate apiJsonTemplate) {
+
+		// check whether the object is a simple attribute or a Has A relationship with
+		// diff entity.
+		if (apiJsonTemplate.getDataType().getClass().getSimpleName().equals("String")) {
 			String entityName = apiJsonTemplate.getEntityName();
-			if(entitiesMap.get(entityName) == null || entitiesMap.get(entityName).size() == 0) {
+			if (entitiesMap.get(entityName) == null || entitiesMap.get(entityName).size() == 0) {
 				// fetch the preList and then insert into in the the map
 				List<ApiJsonTemplate> newList = new ArrayList<>();
 				newList.add(apiJsonTemplate);
 				entitiesMap.put(entityName, newList);
-			}else {
+			} else {
 				List<ApiJsonTemplate> preList = entitiesMap.get(entityName);
 				preList.add(apiJsonTemplate);
 				entitiesMap.put(entityName, preList);
 			}
-		}else {
-			//add it to list and send it to recursion.
+		} else {
+			// add it to list and send it to recursion.
 			ObjectMapper mapper = new ObjectMapper();
-			List<ApiJsonTemplate> nestedList = (List<ApiJsonTemplate>)apiJsonTemplate.getDataType();
-			
+			List<ApiJsonTemplate> nestedList = (List<ApiJsonTemplate>) apiJsonTemplate.getDataType();
+
 			String entityName = apiJsonTemplate.getEntityName();
-			if(entitiesMap.get(entityName) == null || entitiesMap.get(entityName).size() == 0) {
+			if (entitiesMap.get(entityName) == null || entitiesMap.get(entityName).size() == 0) {
 				// fetch the preList and then insert into in the the map
 				List<ApiJsonTemplate> newList = new ArrayList<>();
-				apiJsonTemplate.setDataType(apiJsonTemplate.getColumnName().substring(0,1).toUpperCase()+apiJsonTemplate.getColumnName().substring(1));
+				apiJsonTemplate.setDataType(apiJsonTemplate.getColumnName().substring(0, 1).toUpperCase()
+						+ apiJsonTemplate.getColumnName().substring(1));
 				newList.add(apiJsonTemplate);
 				entitiesMap.put(entityName, newList);
-			}else {
+			} else {
 				List<ApiJsonTemplate> preList = entitiesMap.get(entityName);
-				apiJsonTemplate.setDataType(apiJsonTemplate.getColumnName().substring(0,1).toUpperCase()+apiJsonTemplate.getColumnName().substring(1));
+				apiJsonTemplate.setDataType(apiJsonTemplate.getColumnName().substring(0, 1).toUpperCase()
+						+ apiJsonTemplate.getColumnName().substring(1));
 				preList.add(apiJsonTemplate);
 				entitiesMap.put(entityName, preList);
 			}
@@ -194,137 +203,158 @@ public class AppServiceImpl implements AppService{
 			for (Iterator<ApiJsonTemplate> iterator = nestedList.iterator(); iterator.hasNext();) {
 				ApiJsonTemplate nestedApiJsonTemplate = mapper.convertValue(iterator.next(), ApiJsonTemplate.class);
 				prepareApiJsonTemplateObj(entitiesMap, nestedApiJsonTemplate);
-			}	
+			}
 		}
 		return entitiesMap;
 	}
-	
-	
-	public void generateFileFromTemplate(Map<String,Object> map,String templateName,String location,String fileName) {
+
+	public void generateFileFromTemplate(Map<String, Object> map, String templateName, String location,
+			String fileName) {
 		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-		try{
-			cfg.setDirectoryForTemplateLoading(new File(System.getProperty("user.dir")+"\\src\\main\\resources\\templates"));
+		try {
+			cfg.setDirectoryForTemplateLoading(
+					new File(System.getProperty("user.dir") + "\\src\\main\\resources\\templates"));
 			cfg.setDefaultEncoding("UTF-8");
-			Template template=cfg.getTemplate(templateName);
-			File file=new File(location+fileName+".java");
+			Template template = cfg.getTemplate(templateName);
+			File file = new File(location + fileName + ".java");
 			file.createNewFile();
-			Writer writer=new FileWriter(file);
+			Writer writer = new FileWriter(file);
 			template.process(map, writer);
 			writer.close();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void generateFileFromTemplateV2(Map<String,Object> map,String templateName,String location,String fileName) {
-		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-		try{
-			cfg.setDirectoryForTemplateLoading(new File(System.getProperty("user.dir")+"\\src\\main\\resources\\templates"));
-			cfg.setDefaultEncoding("UTF-8");
-			Template template=cfg.getTemplate(templateName);
-			File file=new File(location);
-			file.mkdirs();
-			file=new File(location+fileName+".java");
-			file.createNewFile();
-			Writer writer=new FileWriter(file);
-			template.process(map, writer);
-			writer.close();
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void generateFilesFromTemplate(Map<String,Map<String,Object>> listOfMap,Model model,String src,String dest) {
-		final String modelName=model.getModelName();
-		generateFileFromTemplate(listOfMap.get("entityMap"), "EntityTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"entity\\",modelName);
-		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ControllerTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"controller\\", modelName+"Controller");
-		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "RepositoryTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"repository\\", modelName+"Repository");
-		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ServiceTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"service\\", modelName+"Service");
-		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ServiceImplTemplate.ftl",dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+"service\\", modelName+"ServiceImpl");
+	public void generateFileFromTemplateV2(Map<String, Object> map, String templateType, String templateName,
+			String location, String fileName,String fileExt) {
+		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
+		try {
+			if(fileExt.equals(".java"))
+				location = location + File.separator + templateType + File.separator;
+			else
+				location = location + File.separator;
+			
+			cfg.setDirectoryForTemplateLoading(new File(System.getProperty("user.dir")+File.separator+"src"+
+							File.separator+"main"+File.separator+"resources"+File.separator+"templates"+File.separator+templateType));
+			cfg.setDefaultEncoding("UTF-8");
+			Template template = cfg.getTemplate(templateName);
+			File file = new File(location);
+			file.mkdirs();
+			file = new File(location + fileName + fileExt);
+			file.createNewFile();
+			Writer writer = new FileWriter(file);
+			template.process(map, writer);
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
+	public void generateFilesFromTemplate(Map<String, Map<String, Object>> listOfMap, Model model, String src,
+			String dest) {
+		final String modelName = model.getModelName();
+		generateFileFromTemplate(listOfMap.get("entityMap"), "EntityTemplate.ftl",
+				dest + BASE_JAVA_FOLDER + BASE_PACKAGE + "entity\\", modelName);
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ControllerTemplate.ftl",
+				dest + BASE_JAVA_FOLDER + BASE_PACKAGE + "controller\\", modelName + "Controller");
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "RepositoryTemplate.ftl",
+				dest + BASE_JAVA_FOLDER + BASE_PACKAGE + "repository\\", modelName + "Repository");
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ServiceTemplate.ftl",
+				dest + BASE_JAVA_FOLDER + BASE_PACKAGE + "service\\", modelName + "Service");
+		generateFileFromTemplate(listOfMap.get(GENERIC_MAP), "ServiceImplTemplate.ftl",
+				dest + BASE_JAVA_FOLDER + BASE_PACKAGE + "service\\", modelName + "ServiceImpl");
+	}
+
 	/**
-	 * used to create java files for project like entities, controller, service, repositories etc from templates and template values.
+	 * used to create java files for project like entities, controller, service,
+	 * repositories etc from templates and template values.
+	 * 
 	 * @author shivam, rohan
-	 * @param entitiesMap to be finally made.
-	 * @param src for source files.
-	 * @param dest for destination file location.
-	 * @param apiDto for current api to be made.
+	 * @param entitiesMap      to be finally made.
+	 * @param src              for source files.
+	 * @param dest             for destination file location.
+	 * @param apiDto           for current api to be made.
 	 * @param getApiMethodName if it is a get call then it is provided.
 	 */
-	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> entitiesMap,String src,String dest,API apiDto,String getApiMethodName) {
-		
+	public void generateFilesFromTemplateV2(Map<String, List<ApiJsonTemplate>> entitiesMap, String src, String dest,
+			API apiDto, String getApiMethodName) {
+
 		Set<String> entities = entitiesMap.keySet();
-		
+
 		// iterating over json string for fetching all entities.
 		for (String entityName : entities) {
-			Map<String,Object> entityMap=new HashMap<>();
+			Map<String, Object> entityMap = new HashMap<>();
 			entityMap.put("params", entitiesMap.get(entityName));
 			entityMap.put("tableName", entityName);
 			entityMap.put("EntityName", entityName);
 			entityMap.put("ApiName", apiDto.getApiName());
-			
-			generateFileFromTemplateV2(entityMap, "EntityTemplate.ftl",dest+BASE_JAVA_FOLDER+
-					BASE_PACKAGE+apiDto.getApiName()+"\\"+"entity\\",entityName);
+
+			String filename = entityName.substring(0,1).toUpperCase()+entityName.substring(1);
+			generateFileFromTemplateV2(entityMap, "entity", "EntityTemplate.ftl",
+					dest + BASE_JAVA_FOLDER + BASE_PACKAGE + apiDto.getApiName(), filename,".java");
 		}
-		Map<String,Object> entityMap=new HashMap<>();
+		Map<String, Object> entityMap = new HashMap<>();
 		entityMap.put("EntityName", apiDto.getMainEntityName());
 		entityMap.put("ApiName", apiDto.getApiName());
 		entityMap.put("ApiUrl", apiDto.getApiUrl());
 		entityMap.put("idType", apiDto.getMainEntityIdType());
 		entityMap.put("params", apiDto.getGetParams());
 		entityMap.put("MethodName", getApiMethodName);
-		
-		
-		String destinationPath = dest+BASE_JAVA_FOLDER+
-				BASE_PACKAGE+apiDto.getApiName();
-		
+
+		String destinationPath = dest + BASE_JAVA_FOLDER + BASE_PACKAGE + apiDto.getApiName();
+
+		String apiName = apiDto.getApiName().substring(0,1).toUpperCase()+apiDto.getApiName().substring(1);
 		// creating accordingly for each api type.
-		if(apiDto.getApiType().equalsIgnoreCase("post")) {
-			
-			generateFileFromTemplateV2(entityMap, "PostControllerTemplate.ftl",destinationPath+"\\"+"controller\\", apiDto.getApiName()+"Controller");
-			
-			generateFileFromTemplateV2(entityMap, "PostServiceTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"Service");
-			generateFileFromTemplateV2(entityMap, "PostServiceImplTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
-			
-			generateFileFromTemplateV2(entityMap, "PostRepositoryTemplate.ftl",destinationPath+"\\"+"repository\\", apiDto.getApiName()+"Repository");
-		}else if(apiDto.getApiType().equalsIgnoreCase("put")) {
-			generateFileFromTemplateV2(entityMap, "PutControllerTemplate.ftl",destinationPath+"\\"+"controller\\", apiDto.getApiName()+"Controller");
-			
-			
-			generateFileFromTemplateV2(entityMap, "PutServiceTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"Service");
-			generateFileFromTemplateV2(entityMap, "PutServiceImplTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
-			
-			generateFileFromTemplateV2(entityMap, "PutRepositoryTemplate.ftl",destinationPath+"\\"+"repository\\", apiDto.getApiName()+"Repository");
-			
-		}else if(apiDto.getApiType().equalsIgnoreCase("get")) {
-			generateFileFromTemplateV2(entityMap, "GetControllerTemplate.ftl",destinationPath+"\\"+"controller\\", apiDto.getApiName()+"Controller");
-			
-			
-			generateFileFromTemplateV2(entityMap, "GetServiceTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"Service");
-			generateFileFromTemplateV2(entityMap, "GetServiceImplTemplate.ftl",destinationPath+"\\"+"service\\", apiDto.getApiName()+"ServiceImpl");
-			
-			generateFileFromTemplateV2(entityMap, "GetRepositoryTemplate.ftl",destinationPath+"\\"+"repository\\", apiDto.getApiName()+"Repository");
-			
-		}else if(apiDto.getApiType().equalsIgnoreCase("delete")) {
-			//TODO for delete type api
-			
+		if (apiDto.getApiType().equalsIgnoreCase("post")) {
+
+			generateFileFromTemplateV2(entityMap, "controller", "PostControllerTemplate.ftl", destinationPath,
+					apiName + "Controller",".java");
+
+			generateFileFromTemplateV2(entityMap, "service", "PostServiceTemplate.ftl", destinationPath,
+					apiName + "Service",".java");
+			generateFileFromTemplateV2(entityMap, "service", "PostServiceImplTemplate.ftl", destinationPath,
+					apiName + "ServiceImpl",".java");
+
+			generateFileFromTemplateV2(entityMap, "repository", "PostRepositoryTemplate.ftl", destinationPath,
+					apiName + "Repository",".java");
+		} else if (apiDto.getApiType().equalsIgnoreCase("put")) {
+			generateFileFromTemplateV2(entityMap, "controller", "PutControllerTemplate.ftl", destinationPath,
+					apiName + "Controller",".java");
+
+			generateFileFromTemplateV2(entityMap, "service", "PutServiceTemplate.ftl", destinationPath,
+					apiName + "Service",".java");
+			generateFileFromTemplateV2(entityMap, "service", "PutServiceImplTemplate.ftl", destinationPath,
+					apiName + "ServiceImpl",".java");
+
+			generateFileFromTemplateV2(entityMap, "repository", "PutRepositoryTemplate.ftl", destinationPath,
+					apiName + "Repository",".java");
+
+		} else if (apiDto.getApiType().equalsIgnoreCase("get")) {
+			generateFileFromTemplateV2(entityMap, "controller", "GetControllerTemplate.ftl", destinationPath,
+					apiName + "Controller",".java");
+
+			generateFileFromTemplateV2(entityMap, "service", "GetServiceTemplate.ftl", destinationPath,
+					apiName + "Service",".java");
+			generateFileFromTemplateV2(entityMap, "service", "GetServiceImplTemplate.ftl", destinationPath,
+					apiName + "ServiceImpl",".java");
+
+			generateFileFromTemplateV2(entityMap, "repository", "GetRepositoryTemplate.ftl", destinationPath,
+					apiName + "Repository",".java");
+
+		} else if (apiDto.getApiType().equalsIgnoreCase("delete")) {
+			// TODO for delete type api
+
 		}
-		
+
 	}
-	
+
 	public void compileProject(String fileLocation) {
-		
+
 	}
-	
-	public static void runProcess(String command) throws IOException{
-		Process process=Runtime.getRuntime().exec(command);
+
+	public static void runProcess(String command) throws IOException {
+		Process process = Runtime.getRuntime().exec(command);
 	}
-	
-	 
+
 }

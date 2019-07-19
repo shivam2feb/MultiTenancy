@@ -34,11 +34,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
+import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
+import com.mfsi.appbuilder.service.AppServiceImpl;
 import com.mfsi.appbuilder.service.PersistenceService;
 
 @RestController
@@ -86,6 +88,8 @@ public class AppController {
 		// fetch from db
 		List<API> apis = persistenceService.getAPI(projectId);
 
+		String dest = null;
+
 		// loop on all apis
 		for (API api : apis) {
 
@@ -93,7 +97,7 @@ public class AppController {
 			if (api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
 
-			String dest = destination + File.separator + api.getProjectName();
+			dest = destination + File.separator + api.getProjectName();
 
 			this.projectName = api.getProjectName();
 			this.dest = dest;
@@ -104,6 +108,16 @@ public class AppController {
 				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
 			}
 		}
+		
+		Map<String, Object> appPropsMap = new HashMap<String, Object>();
+		
+		Project projectDetails = persistenceService.getProjectDetails(projectId);
+		appPropsMap.put("db_schemaname", projectDetails.getSchema());
+		appPropsMap.put("db_username", projectDetails.getDbUsername());
+		appPropsMap.put("db_password", projectDetails.getDbPassword());
+		
+		appService.generateFileFromTemplateV2(appPropsMap, "property", "application.properties.ftl", dest+ File.separator+AppServiceImpl.BASE_RESOURCES_FOLDER, "application", ".properties");
+		
 
 		// Use the following paths for windows
 		// String folderToZip = "c:\\demo\\test";
@@ -111,6 +125,7 @@ public class AppController {
 
 		// Linux/mac paths
 		String folderToZip = this.dest;
+		System.out.println(folderToZip);
 		String zipName = this.dest + ".zip";
 		File file = new File(this.dest + ".zip");
 

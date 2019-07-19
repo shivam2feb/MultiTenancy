@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.app.entity.*;
-import com.app.repository.*;
+import com.app.${ApiName}.entity.*;
+import com.app.${ApiName}.repository.*;
 
 @Service
 @Transactional(propagation=Propagation.SUPPORTS)
@@ -15,6 +15,8 @@ public class ${EntityName}ServiceImpl implements ${EntityName}Service{
 	<#assign EntityName = "${EntityName?cap_first}">
 	<#assign entityName = "${EntityName?uncap_first}">
 	<#assign repository ="${entityName}Repository" >
+	<#assign ApiName = "${ApiName?cap_first}">
+	
 	
 	@Autowired 
 	${EntityName}Repository ${repository};
