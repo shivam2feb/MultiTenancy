@@ -78,7 +78,8 @@ public class ProjectController {
 		persistenceService.createAPI(apiDTO);
 	}
 
-	/**`
+
+	/**
 	 * method for getting all apis within projects
 	 * author: shubham
 	 * @param projectId 
@@ -99,4 +100,5 @@ public class ProjectController {
 		
 		persistenceService.deleteApi(api.getId());
 	}
+
 }
