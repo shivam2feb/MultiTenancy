@@ -62,8 +62,4 @@ public class ProjectController {
 		persistenceService.createAPI(apiDTO);
 	}
 
-	@GetMapping("/getApiByProjectId/{projectId}")
-	public List<API> getAPI(@PathVariable String projectId) {
-		return persistenceService.getAPI(projectId);
-	}
 }

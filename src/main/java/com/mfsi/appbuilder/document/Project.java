@@ -14,7 +14,7 @@ import java.util.Map;
 public class Project {
 	
 	@Id
-	private String id;
+	private String _id;
 	
 	private String projectName;
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
@@ -50,14 +50,14 @@ public class Project {
         this.userId = userId;
 	}
 
-	public String getId() {
-		return id;
+	public String get_id() {
+		return _id;
 	}
-	
-	public void setId(String id) {
-		this.id = id;
+
+	public void set_id(String _id) {
+		this._id = _id;
 	}
-	
+
 	public String getProjectName() {
 		return projectName;
 	}
@@ -76,8 +76,6 @@ public class Project {
 
     public String getLastUpdatedOn() {
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-
-        System.out.println(sdf.format(lastUpdatedOn));
         return sdf.format(lastUpdatedOn);
 	}
 
