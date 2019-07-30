@@ -14,9 +14,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -63,17 +65,6 @@ public class AppController {
 
 	private String projectName = new String();
 
-	@PostMapping(value = "/model")
-	public void createProject(@RequestBody Model model) {
-		String dest = destination + "\\" + model.getApplicationName();
-		if (appService.copyFolder(src, dest)) {
-			String entityName = model.getModelName();
-			entityName = entityName.substring(0, 1).toUpperCase() + entityName.substring(1);
-			model.setModelName(entityName);
-			Map<String, Map<String, Object>> listOfMap = appService.prepareMapForTemplate(model);
-			appService.generateFilesFromTemplate(listOfMap, model, src, dest + "\\");
-		}
-	}
 
 	/**
 	 * Used to download the projects to client machine.
@@ -87,11 +78,18 @@ public class AppController {
 
 		// fetch from db
 		List<API> apis = persistenceService.getAPI(projectId);
-
+		Project projectDetails = persistenceService.getProjectDetails(projectId);
+		Boolean wantedSecurity = projectDetails.getWantSecurity();
+		
 		String dest = null;
+
+		Set<String> securityUrls = new HashSet<>();
 
 		// loop on all apis
 		for (API api : apis) {
+			
+			if(wantedSecurity)
+				securityUrls.add("/"+api.getApiUrl()+"/*");
 
 			// for creating the repository method name like findBy"something"
 			if (api.getApiType().equalsIgnoreCase("get"))
@@ -102,22 +100,24 @@ public class AppController {
 			this.projectName = api.getProjectName();
 			this.dest = dest;
 
-			if (appService.copyFolder(src, dest)) {
+			if (appService.copyFolder(src, dest, wantedSecurity)) {
 
 				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
 				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
 			}
 		}
-		
+		if(wantedSecurity)
+			persistenceService.pushSecurityUrls(projectDetails, securityUrls);
+
 		Map<String, Object> appPropsMap = new HashMap<String, Object>();
+
 		
-		Project projectDetails = persistenceService.getProjectDetails(projectId);
 		appPropsMap.put("db_schemaname", projectDetails.getSchema());
 		appPropsMap.put("db_username", projectDetails.getDbUsername());
 		appPropsMap.put("db_password", projectDetails.getDbPassword());
-		
-		appService.generateFileFromTemplateV2(appPropsMap, "property", "application.properties.ftl", dest+ File.separator+AppServiceImpl.BASE_RESOURCES_FOLDER, "application", ".properties");
-		
+
+		appService.generateFileFromTemplateV2(appPropsMap, "property", "application.properties.ftl",
+				dest + File.separator + AppServiceImpl.BASE_RESOURCES_FOLDER, "application", ".properties");
 
 		// Use the following paths for windows
 		// String folderToZip = "c:\\demo\\test";

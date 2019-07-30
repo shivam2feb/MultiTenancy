@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.sql.Connection;
 import java.util.List;
 
 @RestController
@@ -28,11 +29,16 @@ public class ProjectController {
 	@PostMapping("/create")
 	private Project createProject(@RequestBody ProjectDTO projectDTO, Principal principal) throws Exception {
         projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
-		if (persistenceService.getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername()
-				, projectDTO.getDbPassword()) == null)
+        Connection conn = persistenceService.getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername()
+				, projectDTO.getDbPassword()); 
+		if (conn == null)
 			projectDTO.setVerified(false);
-		else
+		else {
 			projectDTO.setVerified(true);
+			if(projectDTO.getWantSecurity())
+				persistenceService.createMatcherTable(conn);
+			conn.close();
+		}
 		return persistenceService.saveProject(projectDTO);
 	}
 

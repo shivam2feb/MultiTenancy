@@ -15,6 +15,23 @@ public class ProjectDTO {
 	private String schema;
 	private String dbURL;
 	private Boolean isVerified;
+	private Boolean wantSecurity = true;
+
+	
+
+	/**
+	 * @return the wantSecurity
+	 */
+	public Boolean getWantSecurity() {
+		return wantSecurity;
+	}
+
+	/**
+	 * @param wantSecurity the wantSecurity to set
+	 */
+	public void setWantSecurity(Boolean wantSecurity) {
+		this.wantSecurity = wantSecurity;
+	}
 
 	public String getUserId() {
 		return userId;

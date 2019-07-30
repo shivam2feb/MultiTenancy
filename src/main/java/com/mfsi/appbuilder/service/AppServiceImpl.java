@@ -69,11 +69,15 @@ public class AppServiceImpl implements AppService {
 		return methodName.toString();
 	}
 
-	public boolean copyFolder(String srcPath, String dscPath) {
+	public boolean copyFolder(String srcPath, String dscPath,Boolean wantedSecurity) {
 		File srcFolder = null;
 		try {
-			srcFolder = new ClassPathResource("templateProject").getFile();
-
+			System.out.println(wantedSecurity);
+			if(wantedSecurity)
+				srcFolder = new ClassPathResource("templateProject"+ File.separator + "withSecurity").getFile();
+			else
+				srcFolder = new ClassPathResource("templateProject"+ File.separator + "withoutSecurity").getFile();
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
