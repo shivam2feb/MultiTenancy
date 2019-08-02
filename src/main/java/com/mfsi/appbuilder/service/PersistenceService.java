@@ -23,4 +23,5 @@ public interface PersistenceService {
 	public Map<String, List<String>> getDBInfo(ProjectDTO projectDTO);
 
 	public Connection getMySqlConnection(String url, String username, String password) throws Exception;
+	public void updateAPI(ApiDto apiDTO);
 }

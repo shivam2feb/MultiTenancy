@@ -240,7 +240,7 @@ appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMetho
 	}
 
 	@PostMapping(value = "/getDBInfo")
-	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {
+	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {		
 		return persistenceService.getDBInfo(projectDTO);
 	}
 

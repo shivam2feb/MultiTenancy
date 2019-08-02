@@ -126,6 +126,7 @@ public class PersistenceServiceImpl implements PersistenceService {
         api.setMainEntityName(apiDTO.getMainEntityName());
         api.setApiUrl(apiDTO.getApiUrl());
         api.setGetParams(apiDTO.getGetParams());
+        api.setReJson(apiDTO.getReJson());
         apiRepository.save(api);
     }
 
@@ -152,7 +153,7 @@ public class PersistenceServiceImpl implements PersistenceService {
         ResultSet resultSet = null;
         try {
             conn = getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername(), projectDTO.getDbPassword());
-            if (null != conn) {
+            if (null == conn) {
                 throw new RuntimeException("Invalid DB Credentials");
             }
             meta = conn.getMetaData();
@@ -204,6 +205,25 @@ public class PersistenceServiceImpl implements PersistenceService {
 	public void deleteApi(String apiId) {
 		// TODO Auto-generated method stub
 		apiRepository.deleteById(apiId);
+	}
+
+	@Override
+	public void updateAPI(ApiDto apiDTO) {
+		// TODO Auto-generated method stub
+		API api = new API();
+		api.setId(apiDTO.getId());
+        api.setApiName(apiDTO.getApiName());
+        api.setApiType(apiDTO.getApiType());
+        api.setJsonString(apiDTO.getJsonString());
+        api.setProjectId(apiDTO.getProjectId());
+        api.setProjectName(apiDTO.getProjectName());
+        api.setMainEntityIdType(apiDTO.getMainEntityIdType());
+        api.setMainEntityName(apiDTO.getMainEntityName());
+        api.setApiUrl(apiDTO.getApiUrl());
+        api.setGetParams(apiDTO.getGetParams());
+        api.setReJson(apiDTO.getReJson());
+        apiRepository.save(api);
+		
 	}
 
 }

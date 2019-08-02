@@ -75,7 +75,19 @@ public class ProjectController {
 	 */
 	@PostMapping("/createAPI")
 	public void createAPI(@RequestBody ApiDto apiDTO) {
+		System.out.println("inside create");
 		persistenceService.createAPI(apiDTO);
+	}
+	
+	/**
+	 * method to create a new API for a project
+	 * author: shubham
+	 * @param apiDTO containing project id and api Json data
+	 */
+	@PostMapping("/updateAPI")
+	public void updateAPI(@RequestBody ApiDto apiDTO) {
+		System.out.println("inside update");
+		persistenceService.updateAPI(apiDTO);
 	}
 
 
