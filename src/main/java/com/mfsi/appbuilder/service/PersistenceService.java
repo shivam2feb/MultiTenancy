@@ -15,10 +15,13 @@ public interface PersistenceService {
 	public List<Project> getProject(String projectName);
 	public List<Project> getAllProjects();
 	public void createAPI(ApiDto api);
+	
+	public void deleteApi(String apiId);
 	public List<API> getAPI(String projectId);
 	public Project getProjectDetails(String projectId);
 
 	public Map<String, List<String>> getDBInfo(ProjectDTO projectDTO);
 
 	public Connection getMySqlConnection(String url, String username, String password) throws Exception;
+	public void updateAPI(ApiDto apiDTO);
 }
