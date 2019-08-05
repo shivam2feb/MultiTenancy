@@ -18,6 +18,107 @@ public class API {
 	private String mainEntityName;
 	private String mainEntityIdType;
 	private List<ApiJsonTemplate> getParams;
+	private boolean isSecured;
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((apiName == null) ? 0 : apiName.hashCode());
+		result = prime * result + ((apiType == null) ? 0 : apiType.hashCode());
+		result = prime * result + ((apiUrl == null) ? 0 : apiUrl.hashCode());
+		result = prime * result + ((getParams == null) ? 0 : getParams.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + (isSecured ? 1231 : 1237);
+		result = prime * result + ((jsonString == null) ? 0 : jsonString.hashCode());
+		result = prime * result + ((mainEntityIdType == null) ? 0 : mainEntityIdType.hashCode());
+		result = prime * result + ((mainEntityName == null) ? 0 : mainEntityName.hashCode());
+		result = prime * result + ((projectId == null) ? 0 : projectId.hashCode());
+		result = prime * result + ((projectName == null) ? 0 : projectName.hashCode());
+		return result;
+	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		API other = (API) obj;
+		if (apiName == null) {
+			if (other.apiName != null)
+				return false;
+		} else if (!apiName.equals(other.apiName))
+			return false;
+		if (apiType == null) {
+			if (other.apiType != null)
+				return false;
+		} else if (!apiType.equals(other.apiType))
+			return false;
+		if (apiUrl == null) {
+			if (other.apiUrl != null)
+				return false;
+		} else if (!apiUrl.equals(other.apiUrl))
+			return false;
+		if (getParams == null) {
+			if (other.getParams != null)
+				return false;
+		} else if (!getParams.equals(other.getParams))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (isSecured != other.isSecured)
+			return false;
+		if (jsonString == null) {
+			if (other.jsonString != null)
+				return false;
+		} else if (!jsonString.equals(other.jsonString))
+			return false;
+		if (mainEntityIdType == null) {
+			if (other.mainEntityIdType != null)
+				return false;
+		} else if (!mainEntityIdType.equals(other.mainEntityIdType))
+			return false;
+		if (mainEntityName == null) {
+			if (other.mainEntityName != null)
+				return false;
+		} else if (!mainEntityName.equals(other.mainEntityName))
+			return false;
+		if (projectId == null) {
+			if (other.projectId != null)
+				return false;
+		} else if (!projectId.equals(other.projectId))
+			return false;
+		if (projectName == null) {
+			if (other.projectName != null)
+				return false;
+		} else if (!projectName.equals(other.projectName))
+			return false;
+		return true;
+	}
+	/**
+	 * @return the isSecured
+	 */
+	public boolean isSecured() {
+		return isSecured;
+	}
+	/**
+	 * @param isSecured the isSecured to set
+	 */
+	public void setSecured(boolean isSecured) {
+		this.isSecured = isSecured;
+	}
+
 	private String reJson;
 	
 	
@@ -26,6 +127,7 @@ public class API {
 	}
 	public void setReJson(String reJson) {
 		this.reJson = reJson;
+
 	}
 	public List<ApiJsonTemplate> getGetParams() {
 		return getParams;
