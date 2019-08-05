@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class ProjectDTO {
 
+	private String _id;
 	private String projectName;
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
 	private String lastUpdatedOn;
@@ -15,6 +16,14 @@ public class ProjectDTO {
 	private String schema;
 	private String dbURL;
 	private Boolean isVerified;
+
+	public String get_id() {
+		return _id;
+	}
+
+	public void set_id(String _id) {
+		this._id = _id;
+	}
 
 	public String getUserId() {
 		return userId;

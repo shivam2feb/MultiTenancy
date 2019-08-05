@@ -20,6 +20,12 @@ public class ProjectController {
 	@Autowired
 	private PersistenceService persistenceService;
 
+	/**
+	 * getting all projects created by a user
+	 * author: shubham
+	 * @param principal
+	 * @return list of project object
+	 */
 	@GetMapping("/byName")
 	public List<Project> getProject(Principal principal) {
 		return persistenceService.getProject(AppBuilderUtil.getLoggedInUserId());
@@ -36,6 +42,11 @@ public class ProjectController {
 		return persistenceService.saveProject(projectDTO);
 	}
 
+	/**
+	 * method to get all projects 
+	 * author: shubham
+	 * @return list of projects
+	 */
 	@GetMapping("/getAll")
 	public List<Project> getAllProjects() {
 		return persistenceService.getAllProjects();
@@ -46,18 +57,60 @@ public class ProjectController {
 		return persistenceService.getAPI(id);
 	}
 
+	/**
+	 * method to get all project using project name
+	 * author: shubham
+	 * @param projectName
+	 * @return
+	 */
 	@GetMapping("/byProjectName/{projectName}")
 	public Project getProjectDetails(@PathVariable String projectName) {
 		return persistenceService.getProjectDetails(projectName);
 	}
 
+	/**
+	 * method to create a new API for a project
+	 * author: shubham
+	 * @param apiDTO containing project id and api Json data
+	 */
 	@PostMapping("/createAPI")
 	public void createAPI(@RequestBody ApiDto apiDTO) {
+		System.out.println("inside create");
 		persistenceService.createAPI(apiDTO);
 	}
+	
+	/**
+	 * method to create a new API for a project
+	 * author: shubham
+	 * @param apiDTO containing project id and api Json data
+	 */
+	@PostMapping("/updateAPI")
+	public void updateAPI(@RequestBody ApiDto apiDTO) {
+		System.out.println("inside update");
+		persistenceService.updateAPI(apiDTO);
+	}
 
+
+	/**
+	 * method for getting all apis within projects
+	 * author: shubham
+	 * @param projectId 
+	 * @return list of API objects
+	 */
 	@GetMapping("/getApiByProjectId/{projectId}")
 	public List<API> getAPI(@PathVariable String projectId) {
 		return persistenceService.getAPI(projectId);
 	}
+	
+	/**
+	 * Method for permanently delete the api
+	 * author: shubham
+	 * @param api : the api object which is going to delete
+	 */
+	@PostMapping("/deleteApi")
+	public void deleteAPI(@RequestBody ApiDto api) {
+		
+		persistenceService.deleteApi(api.getId());
+	}
+
 }
