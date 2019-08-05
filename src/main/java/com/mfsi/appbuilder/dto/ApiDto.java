@@ -19,6 +19,7 @@ public class ApiDto {
 	private String mainEntityName;
 	private String mainEntityIdType;
 	private List<ApiJsonTemplate> getParams;
+
 	private boolean isSecured = true;
 	
 	
@@ -117,6 +118,18 @@ public class ApiDto {
 
 	public void setSecured(boolean isSecured) {
 		this.isSecured = isSecured;
+	}
+	private String reJson;
+	
+	
+
+	
+	public String getReJson() {
+		return reJson;
+	}
+
+	public void setReJson(String reJson) {
+		this.reJson = reJson;
 	}
 
 	public List<ApiJsonTemplate> getGetParams() {

@@ -1,5 +1,9 @@
 package com.mfsi.appbuilder.controller;
 
+/**
+ * 
+ */
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -61,9 +65,13 @@ public class AppController {
 	@Value("${destinationSource}")
 	private String destination;
 
+	/**
+	 * saving destination and project name for storing zip 
+	 */
 	private String dest = new String();
 
 	private String projectName = new String();
+
 
 
 	/**
@@ -119,11 +127,15 @@ public class AppController {
 		appService.generateFileFromTemplateV2(appPropsMap, "property", "application.properties.ftl",
 				dest + File.separator + AppServiceImpl.BASE_RESOURCES_FOLDER, "application", ".properties");
 
+
 		// Use the following paths for windows
 		// String folderToZip = "c:\\demo\\test";
 		// String zipName = "c:\\demo\\test.zip";
-
 		// Linux/mac paths
+		/**
+		 * Code for converting project folder to zip and make zip downloadable
+		 * author: shubham
+		 */
 		String folderToZip = this.dest;
 		System.out.println(folderToZip);
 		String zipName = this.dest + ".zip";
@@ -146,9 +158,15 @@ public class AppController {
 		}
 
 		String folder = this.dest;
-		// delete folder recursively
-		this.recursiveDelete(new File(folder));
 
+		/**
+		 * method call for deleting the project folder after zip has been created
+		 */
+		this.recursiveDelete(new File(folder));
+		
+		/**
+		 * method call for deleting the zip after download
+		 */
 		this.recursiveDelete(new File(this.dest + ".zip"));
 	}
 
@@ -192,6 +210,12 @@ public class AppController {
 		return true;
 	}
 
+	/**
+	 * method for converting a file to zip file.
+	 * author - shubham
+	 * @param sourceFolderPath -  path of file need to be converted to zip
+	 * @param zipPath - path where zip is going to be created
+	 */
 	private void zipFolder(Path sourceFolderPath, Path zipPath) {
 		try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipPath.toFile()));) {
 			Files.walkFileTree(sourceFolderPath, new SimpleFileVisitor<Path>() {
@@ -207,6 +231,11 @@ public class AppController {
 		}
 	}
 
+	/**
+	 * method for deleting a folder structure recursively
+	 * author- shubham
+	 * @param file the file which is going delete 
+	 */
 	private void recursiveDelete(File file) {
 		// to end the recursive loop
 		if (!file.exists())
@@ -226,7 +255,7 @@ public class AppController {
 	}
 
 	@PostMapping(value = "/getDBInfo")
-	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {
+	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {		
 		return persistenceService.getDBInfo(projectDTO);
 	}
 
