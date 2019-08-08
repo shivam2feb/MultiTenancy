@@ -2,8 +2,7 @@ package com.mfsi.appbuilder.service;
 
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
-import com.mfsi.appbuilder.dto.ApiDto;
-import com.mfsi.appbuilder.dto.ProjectDTO;
+import com.mfsi.appbuilder.dto.*;
 import com.mfsi.appbuilder.repository.APIRepository;
 import com.mfsi.appbuilder.repository.ProjectRepository;
 import org.springframework.beans.BeanUtils;
@@ -11,78 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
-/*
- * <<<<<<< HEAD public class PersistenceServiceImpl implements
- * PersistenceService{
- * 
- * @Autowired ProjectRepository projectRepository;
- * 
- * @Autowired APIRepository apiRepository;
- * 
- * public Project saveProject(ProjectDTO projectDTO) { Project project=new
- * Project(); BeanUtils.copyProperties(projectDTO, project); return
- * projectRepository.save(project); }
- * 
- * @Override public List<Project> getProject(String userId) {
- * 
- * return projectRepository.findByUserId(userId); }
- * 
- * public List<Project> getAllProjects(){ return projectRepository.findAll(); }
- * 
- * 
- * @Override public List<API> getAPI(String projectID) {
- * 
- * return apiRepository.findByProjectId(projectID); }
- * 
- * @Override public void createAPI(ApiDto apiDTO) { API api = new API();
- * api.setApiName(apiDTO.getApiName()); api.setApiType(apiDTO.getApiType());
- * api.setJsonString(apiDTO.getJsonString());
- * api.setProjectId(apiDTO.getProjectId());
- * api.setProjectName(apiDTO.getProjectName());
- * api.setMainEntityIdType(apiDTO.getMainEntityIdType());
- * api.setMainEntityName(apiDTO.getMainEntityName());
- * api.setApiUrl(apiDTO.getApiUrl()); api.setGetParams(apiDTO.getGetParams());
- * api.setReJson(apiDTO.getReJson()); apiRepository.save(api); }
- * 
- * 
- * 
- * @Override public Project getProjectDetails(String projectId) { return
- * projectRepository.findProjectById(projectId); }
- * 
- * 
- * @Override public Map<String, List<String>> getDBInfo(ProjectDTO projectDTO) {
- * Map<String, List<String>> metaData = new HashMap<String, List<String>>();
- * List<String> columns = null; try { Connection conn =
- * getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername(),
- * projectDTO.getDbPassword()); DatabaseMetaData meta = conn.getMetaData();
- * ResultSet resultSet = meta.getColumns(projectDTO.getSchema(), null, "%",
- * "%"); while (resultSet.next()) { columns =
- * metaData.get(resultSet.getString(3)); if (columns == null) { columns = new
- * ArrayList<String>(); columns.add(resultSet.getString(4));
- * metaData.put(resultSet.getString(3), columns); } else {
- * columns.add(resultSet.getString(4)); metaData.put(resultSet.getString(3),
- * columns); } } } catch (SQLException e) { e.printStackTrace(); } return
- * metaData; }
- * 
- * @Override public Connection getMySqlConnection(String url, String username,
- * String password) { String driver = "com.mysql.jdbc.Driver"; // url =
- * "jdbc:mysql://localhost:3306/ems_dev"; // username = "root"; // password =
- * "root"; Connection conn = null; try { Class.forName(driver); conn =
- * DriverManager.getConnection(url, username, password); } catch (SQLException
- * e) { e.printStackTrace(); } catch (ClassNotFoundException e) {
- * e.printStackTrace(); }
- * 
- * return conn; }
- * 
- * @Override public void deleteApi(String apiId) { // TODO Auto-generated method
- * stub apiRepository.deleteById(apiId); } =======
- */
 public class PersistenceServiceImpl implements PersistenceService {
 
     private static final String SQL_DRIVER = "com.mysql.jdbc.Driver";
@@ -145,29 +75,35 @@ public class PersistenceServiceImpl implements PersistenceService {
      * @return Map<String   ,       List   <   String>>
      */
     @Override
-    public Map<String, List<String>> getDBInfo(ProjectDTO projectDTO) {
-        Map<String, List<String>> metaData = new HashMap<String, List<String>>();
-        List<String> columns = null;
+    public Map<String, List<MetaDataDTO>> getDBInfo(ProjectDTO projectDTO) {
+        Map<String, List<MetaDataDTO>> metaData = new HashMap<String, List<MetaDataDTO>>();
+        List<MetaDataDTO> columns = null;
         DatabaseMetaData meta = null;
         Connection conn = null;
         ResultSet resultSet = null;
         try {
-            conn = getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername(), projectDTO.getDbPassword());
+            conn = getMySqlConnection(projectDTO.getDbDetailsDTO().getDbURL(), projectDTO.getDbDetailsDTO().getDbUsername(), projectDTO.getDbDetailsDTO().getDbPassword());
             if (null == conn) {
                 throw new RuntimeException("Invalid DB Credentials");
             }
             meta = conn.getMetaData();
-            resultSet = meta.getColumns(projectDTO.getSchema(), null, "%", "%");
+            resultSet = meta.getColumns(projectDTO.getDbDetailsDTO().getSchema(), null, "%", "%");
             while (resultSet.next()) {
                 columns = metaData.get(resultSet.getString(3));
                 if (columns == null) {
-                    columns = new ArrayList<String>();
-                    columns.add(resultSet.getString(4));
+                    columns = new ArrayList<MetaDataDTO>();
+                    columns.add(new MetaDataDTO(resultSet.getString(4), resultSet.getString(6)));
                     metaData.put(resultSet.getString(3), columns);
                 } else {
-                    columns.add(resultSet.getString(4));
+                    columns.add(new MetaDataDTO(resultSet.getString(4), resultSet.getString(6)));
                     metaData.put(resultSet.getString(3), columns);
                 }
+            }
+            if (null != resultSet) {
+                resultSet.close();
+            }
+            if (null != conn) {
+                conn.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -201,6 +137,46 @@ public class PersistenceServiceImpl implements PersistenceService {
         return conn;
     }
     
+
+    /**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mfsi.appbuilder.service.PersistenceService#pushSecurityUrls(com.mfsi.appbuilder.document.Project,
+	 *      java.util.Set)
+	 * @author rohan used to push the security urls to specific database for
+	 *         bypassing urls from security else it will be protected.
+	 */
+	@Override
+	public void pushSecurityUrls(Project projectDetails, Set<String> securityUrls) {
+        Connection dbConn = getMySqlConnection(projectDetails.getDbDetailsDTO().getDbURL(), projectDetails.getDbDetailsDTO().getDbUsername(),
+                projectDetails.getDbDetailsDTO().getDbPassword());
+
+		try (PreparedStatement ppstmt = dbConn.prepareStatement("INSERT INTO matcher (`url`) VALUES (?)");) {
+
+			for (String url : securityUrls) {
+				ppstmt.setString(1, url);
+				ppstmt.addBatch();
+			}
+			ppstmt.executeBatch();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public boolean createMatcherTable(Connection conn) {
+		boolean isSuccess = false;
+		try (PreparedStatement createStmt = conn.prepareStatement(
+				"CREATE TABLE `matcher` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`url` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`) )");) {
+			isSuccess = createStmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return isSuccess;
+	}
+
     @Override
 	public void deleteApi(String apiId) {
 		// TODO Auto-generated method stub
@@ -226,4 +202,39 @@ public class PersistenceServiceImpl implements PersistenceService {
 		
 	}
 
+    @Override
+    public MetaDataDTO createTable(TableDetailsDTO tableDetailsDTO) {
+        Connection conn = null;
+        Statement statement = null;
+        StringBuilder query = new StringBuilder("CREATE TABLE ");
+        tableDetailsDTO.setDbDetailsDTO(new DBDetailsDTO());
+        tableDetailsDTO.getDbDetailsDTO().setDbURL("jdbc:mysql://localhost:3306/ems_dev");
+        tableDetailsDTO.getDbDetailsDTO().setDbPassword("root");
+        tableDetailsDTO.getDbDetailsDTO().setDbUsername("root");
+        tableDetailsDTO.getDbDetailsDTO().setSchema("ems_dev");
+        try {
+            List<MetaDataDTO> columnList = tableDetailsDTO.getMetaDataDTOs();
+            query.append(tableDetailsDTO.getTableName()).append(" ( ");
+            for (MetaDataDTO column : columnList) {
+                query.append(column.getColumnName()).append(" ").append(column.getDataType()).append(",");
+            }
+            query.append(")");
+            System.out.println(query.toString());
+
+            conn = getMySqlConnection(tableDetailsDTO.getDbDetailsDTO().getDbURL(), tableDetailsDTO.getDbDetailsDTO().getDbUsername(), tableDetailsDTO.getDbDetailsDTO().getDbPassword());
+            statement = conn.createStatement();
+            statement.executeUpdate(query.toString());
+            statement.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteProject(String id) {
+        projectRepository.deleteById(id);
+    }
+	
 }
