@@ -18,9 +18,11 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -38,11 +40,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
+import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
+import com.mfsi.appbuilder.service.AppServiceImpl;
 import com.mfsi.appbuilder.service.PersistenceService;
 
 @RestController
@@ -68,75 +72,85 @@ public class AppController {
 
 	private String projectName = new String();
 
-	@PostMapping(value = "/model")
-	/**
-	 * 
-	 * @param model
-	 */
-	public void createProject(@RequestBody Model model) {
-		String dest = destination + "\\" + model.getApplicationName();
-		if (appService.copyFolder(src, dest)) {
-			String entityName = model.getModelName();
-			entityName = entityName.substring(0, 1).toUpperCase() + entityName.substring(1);
-			model.setModelName(entityName);
-			Map<String, Map<String, Object>> listOfMap = appService.prepareMapForTemplate(model);
-			appService.generateFilesFromTemplate(listOfMap, model, src, dest + "\\");
-		}
-	}
+
 
 	/**
 	 * Used to download the projects to client machine.
+	 * 
 	 * @author rohan
 	 * @param projectId - takes project id to download all apis related to it.
 	 */
-	@GetMapping(value="/downloadProject/{projectId}")
-	public void downloadProject(@PathVariable String projectId,HttpServletResponse response) {
+	@GetMapping(value = "/downloadProject/{projectId}")
+	public void downloadProject(@PathVariable String projectId, HttpServletResponse response) {
 		String getApiMethodName = "";
-		
-		// fetch from db 
+
+		// fetch from db
 		List<API> apis = persistenceService.getAPI(projectId);
+		Project projectDetails = persistenceService.getProjectDetails(projectId);
+		Boolean wantedSecurity = projectDetails.getWantSecurity();
 		
+		String dest = null;
+
+		Set<String> securityUrls = new HashSet<>();
+
 		// loop on all apis
 		for (API api : apis) {
 			
+			if(wantedSecurity)
+				securityUrls.add("/"+api.getApiUrl()+"/*");
+
 			// for creating the repository method name like findBy"something"
-			if(api.getApiType().equalsIgnoreCase("get"))
+			if (api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
-			
-			String dest=destination+"\\"+api.getProjectName();
+
+			dest = destination + File.separator + api.getProjectName();
 
 			this.projectName = api.getProjectName();
 			this.dest = dest;
 
-			if(appService.copyFolder(src, dest)) {
+			if (appService.copyFolder(src, dest, wantedSecurity)) {
 
-Map<String, List<ApiJsonTemplate>> entitiesMap=appService.prepareEntitiesMap(api.getJsonString());
-appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMethodName);
-}
-}	
+				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
+				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
+			}
+		}
+		if(wantedSecurity)
+			persistenceService.pushSecurityUrls(projectDetails, securityUrls);
+
+		Map<String, Object> appPropsMap = new HashMap<String, Object>();
+
+		
+		appPropsMap.put("db_schemaname", projectDetails.getSchema());
+		appPropsMap.put("db_username", projectDetails.getDbUsername());
+		appPropsMap.put("db_password", projectDetails.getDbPassword());
+
+		appService.generateFileFromTemplateV2(appPropsMap, "property", "application.properties.ftl",
+				dest + File.separator + AppServiceImpl.BASE_RESOURCES_FOLDER, "application", ".properties");
 
 
-
+		// Use the following paths for windows
+		// String folderToZip = "c:\\demo\\test";
+		// String zipName = "c:\\demo\\test.zip";
+		// Linux/mac paths
 		/**
 		 * Code for converting project folder to zip and make zip downloadable
 		 * author: shubham
 		 */
 		String folderToZip = this.dest;
+		System.out.println(folderToZip);
 		String zipName = this.dest + ".zip";
-		File file= new File(this.dest + ".zip");
+		File file = new File(this.dest + ".zip");
 
 		this.zipFolder(Paths.get(folderToZip), Paths.get(zipName));
-		try(InputStream is=new FileInputStream(file);
-			OutputStream out=response.getOutputStream();) {
+		try (InputStream is = new FileInputStream(file); OutputStream out = response.getOutputStream();) {
 
-			byte[] buffer=new byte[1024];
-			int bytesRead=-1;
+			byte[] buffer = new byte[1024];
+			int bytesRead = -1;
 			response.setContentType("application/zip");
-			response.addHeader("Content-Disposition", "attachment; filename="+this.projectName+".zip");
-			while((bytesRead=is.read(buffer))!=-1) {
+			response.addHeader("Content-Disposition", "attachment; filename=" + this.projectName + ".zip");
+			while ((bytesRead = is.read(buffer)) != -1) {
 				out.write(buffer, 0, bytesRead);
 			}
-
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -144,6 +158,7 @@ appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMetho
 		}
 
 		String folder = this.dest;
+
 		/**
 		 * method call for deleting the project folder after zip has been created
 		 */
@@ -155,13 +170,13 @@ appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMetho
 		this.recursiveDelete(new File(this.dest + ".zip"));
 	}
 
-	@PostMapping(value="/createPojo")
+	@PostMapping(value = "/createPojo")
 	public void generatePojo(@RequestBody String jsonObj) {
-		Map<String,Object> templateMap=new HashMap<>();
+		Map<String, Object> templateMap = new HashMap<>();
 
-		Map<String,Object> map=new HashMap<>();
-		
-		List<Parameter> listOfParam=new ArrayList<>();
+		Map<String, Object> map = new HashMap<>();
+
+		List<Parameter> listOfParam = new ArrayList<>();
 
 		Parameter param1 = new Parameter();
 		param1.setDataType("Long");
@@ -171,8 +186,8 @@ appService.generateFilesFromTemplateV2(entitiesMap,src,dest+"\\",api,getApiMetho
 		templateMap.put("params", listOfParam);
 		templateMap.put("EntityName", "Model");
 
-		for(Entry<String, Object> entrySet:map.entrySet()) {
-			Parameter param= new Parameter();
+		for (Entry<String, Object> entrySet : map.entrySet()) {
+			Parameter param = new Parameter();
 			param.setDataType(entrySet.getValue().getClass().getSimpleName());
 			param.setColumnName(entrySet.getKey());
 			listOfParam.add(param);

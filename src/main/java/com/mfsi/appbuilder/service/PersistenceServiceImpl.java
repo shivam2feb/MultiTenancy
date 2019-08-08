@@ -1,20 +1,27 @@
 package com.mfsi.appbuilder.service;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.repository.APIRepository;
 import com.mfsi.appbuilder.repository.ProjectRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 /*
@@ -201,6 +208,46 @@ public class PersistenceServiceImpl implements PersistenceService {
         return conn;
     }
     
+
+    /**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.mfsi.appbuilder.service.PersistenceService#pushSecurityUrls(com.mfsi.appbuilder.document.Project,
+	 *      java.util.Set)
+	 * @author rohan used to push the security urls to specific database for
+	 *         bypassing urls from security else it will be protected.
+	 */
+	@Override
+	public void pushSecurityUrls(Project projectDetails, Set<String> securityUrls) {
+		Connection dbConn = getMySqlConnection(projectDetails.getDbURL(), projectDetails.getDbUsername(),
+				projectDetails.getDbPassword());
+
+		try (PreparedStatement ppstmt = dbConn.prepareStatement("INSERT INTO matcher (`url`) VALUES (?)");) {
+
+			for (String url : securityUrls) {
+				ppstmt.setString(1, url);
+				ppstmt.addBatch();
+			}
+			ppstmt.executeBatch();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public boolean createMatcherTable(Connection conn) {
+		boolean isSuccess = false;
+		try (PreparedStatement createStmt = conn.prepareStatement(
+				"CREATE TABLE `matcher` (`id` bigint(20) NOT NULL AUTO_INCREMENT,`url` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`) )");) {
+			isSuccess = createStmt.execute();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return isSuccess;
+	}
+
     @Override
 	public void deleteApi(String apiId) {
 		// TODO Auto-generated method stub
