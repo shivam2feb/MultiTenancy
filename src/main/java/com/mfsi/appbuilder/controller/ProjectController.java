@@ -3,7 +3,9 @@ package com.mfsi.appbuilder.controller;
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
+import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
+import com.mfsi.appbuilder.dto.TableDetailsDTO;
 import com.mfsi.appbuilder.service.PersistenceService;
 import com.mfsi.appbuilder.util.AppBuilderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +37,12 @@ public class ProjectController {
 	@PostMapping("/create")
 	private Project createProject(@RequestBody ProjectDTO projectDTO, Principal principal) throws Exception {
         projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
-        Connection conn = persistenceService.getMySqlConnection(projectDTO.getDbURL(), projectDTO.getDbUsername()
-				, projectDTO.getDbPassword()); 
+		Connection conn = persistenceService.getMySqlConnection(projectDTO.getDbDetailsDTO().getDbURL(), projectDTO.getDbDetailsDTO().getDbUsername()
+				, projectDTO.getDbDetailsDTO().getDbPassword());
 		if (conn == null)
-			projectDTO.setVerified(false);
+			projectDTO.getDbDetailsDTO().setVerified(false);
 		else {
-			projectDTO.setVerified(true);
+			projectDTO.getDbDetailsDTO().setVerified(true);
 			if(projectDTO.getWantSecurity())
 				persistenceService.createMatcherTable(conn);
 			conn.close();
@@ -117,6 +119,24 @@ public class ProjectController {
 	public void deleteAPI(@RequestBody ApiDto api) {
 		
 		persistenceService.deleteApi(api.getId());
+	}
+
+	/**
+	 * Method for  delete the project
+	 * author: nayan
+	 *
+	 * @param
+	 */
+	@DeleteMapping("/deleteProject/{projectId}")
+	public void deleteProject(@PathVariable String projectId) {
+
+		persistenceService.deleteProject(projectId);
+	}
+
+	@PostMapping("/createTable")
+	public MetaDataDTO createTable(@RequestBody TableDetailsDTO dto) {
+		persistenceService.createTable(dto);
+		return null;
 	}
 
 }

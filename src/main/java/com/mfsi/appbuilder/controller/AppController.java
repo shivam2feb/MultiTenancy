@@ -4,50 +4,29 @@ package com.mfsi.appbuilder.controller;
  * 
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
+import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
-import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
 import com.mfsi.appbuilder.service.AppServiceImpl;
 import com.mfsi.appbuilder.service.PersistenceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -119,10 +98,10 @@ public class AppController {
 
 		Map<String, Object> appPropsMap = new HashMap<String, Object>();
 
-		
-		appPropsMap.put("db_schemaname", projectDetails.getSchema());
-		appPropsMap.put("db_username", projectDetails.getDbUsername());
-		appPropsMap.put("db_password", projectDetails.getDbPassword());
+
+		appPropsMap.put("db_schemaname", projectDetails.getDbDetailsDTO().getSchema());
+		appPropsMap.put("db_username", projectDetails.getDbDetailsDTO().getDbUsername());
+		appPropsMap.put("db_password", projectDetails.getDbDetailsDTO().getDbPassword());
 
 		appService.generateFileFromTemplateV2(appPropsMap, "property", "application.properties.ftl",
 				dest + File.separator + AppServiceImpl.BASE_RESOURCES_FOLDER, "application", ".properties");
@@ -255,7 +234,7 @@ public class AppController {
 	}
 
 	@PostMapping(value = "/getDBInfo")
-	public Map<String, List<String>> getDBInfo(@RequestBody ProjectDTO projectDTO) {		
+	public Map<String, List<MetaDataDTO>> getDBInfo(@RequestBody ProjectDTO projectDTO) {
 		return persistenceService.getDBInfo(projectDTO);
 	}
 

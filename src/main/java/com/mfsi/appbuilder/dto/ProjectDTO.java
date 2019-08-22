@@ -11,11 +11,7 @@ public class ProjectDTO {
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
 	private String lastUpdatedOn;
 	private String userId;
-	private String dbUsername;
-	private String dbPassword;
-	private String schema;
-	private String dbURL;
-	private Boolean isVerified;
+	private DBDetailsDTO dbDetailsDTO;
 	private Boolean wantSecurity = true;
 
 	
@@ -33,6 +29,7 @@ public class ProjectDTO {
 	public void setWantSecurity(Boolean wantSecurity) {
 		this.wantSecurity = wantSecurity;
 	}
+
 
 	public String get_id() {
 		return _id;
@@ -74,43 +71,13 @@ public class ProjectDTO {
 		this.lastUpdatedOn = lastUpdatedOn;
 	}
 
-	public String getDbUsername() {
-		return dbUsername;
+	public DBDetailsDTO getDbDetailsDTO() {
+		if (dbDetailsDTO == null)
+			dbDetailsDTO = new DBDetailsDTO();
+		return dbDetailsDTO;
 	}
 
-	public void setDbUsername(String dbUsername) {
-		this.dbUsername = dbUsername;
-	}
-
-	public String getDbPassword() {
-		return dbPassword;
-	}
-
-	public void setDbPassword(String dbPassword) {
-		this.dbPassword = dbPassword;
-	}
-
-	public String getSchema() {
-		return schema;
-	}
-
-	public void setSchema(String schema) {
-		this.schema = schema;
-	}
-
-	public String getDbURL() {
-		return dbURL;
-	}
-
-	public void setDbURL(String dbURL) {
-		this.dbURL = dbURL;
-	}
-
-	public Boolean getVerified() {
-		return isVerified;
-	}
-
-	public void setVerified(Boolean verified) {
-		isVerified = verified;
+	public void setDbDetailsDTO(DBDetailsDTO dbDetailsDTO) {
+		this.dbDetailsDTO = dbDetailsDTO;
 	}
 }
