@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/project")
@@ -134,9 +135,8 @@ public class ProjectController {
 	}
 
 	@PostMapping("/createTable")
-	public MetaDataDTO createTable(@RequestBody TableDetailsDTO dto) {
-		persistenceService.createTable(dto);
-		return null;
+    public Map<String, List<MetaDataDTO>> createTable(@RequestBody TableDetailsDTO dto) {
+        return persistenceService.createTable(dto);
 	}
 
 }

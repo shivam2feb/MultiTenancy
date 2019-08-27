@@ -35,5 +35,5 @@ public interface PersistenceService {
 
 	public void deleteProject(String id);
 
-	public MetaDataDTO createTable(TableDetailsDTO dto);
+	public Map<String, List<MetaDataDTO>> createTable(TableDetailsDTO dto);
 }

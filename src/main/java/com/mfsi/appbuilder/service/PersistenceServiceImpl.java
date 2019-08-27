@@ -2,7 +2,10 @@ package com.mfsi.appbuilder.service;
 
 import com.mfsi.appbuilder.document.API;
 import com.mfsi.appbuilder.document.Project;
-import com.mfsi.appbuilder.dto.*;
+import com.mfsi.appbuilder.dto.ApiDto;
+import com.mfsi.appbuilder.dto.MetaDataDTO;
+import com.mfsi.appbuilder.dto.ProjectDTO;
+import com.mfsi.appbuilder.dto.TableDetailsDTO;
 import com.mfsi.appbuilder.repository.APIRepository;
 import com.mfsi.appbuilder.repository.ProjectRepository;
 import org.springframework.beans.BeanUtils;
@@ -203,20 +206,23 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
     @Override
-    public MetaDataDTO createTable(TableDetailsDTO tableDetailsDTO) {
+    public Map<String, List<MetaDataDTO>> createTable(TableDetailsDTO tableDetailsDTO) {
         Connection conn = null;
         Statement statement = null;
+        Boolean flag = false;
         StringBuilder query = new StringBuilder("CREATE TABLE ");
-        tableDetailsDTO.setDbDetailsDTO(new DBDetailsDTO());
-        tableDetailsDTO.getDbDetailsDTO().setDbURL("jdbc:mysql://localhost:3306/ems_dev");
-        tableDetailsDTO.getDbDetailsDTO().setDbPassword("root");
-        tableDetailsDTO.getDbDetailsDTO().setDbUsername("root");
-        tableDetailsDTO.getDbDetailsDTO().setSchema("ems_dev");
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setDbDetailsDTO(tableDetailsDTO.getDbDetailsDTO());
         try {
             List<MetaDataDTO> columnList = tableDetailsDTO.getMetaDataDTOs();
             query.append(tableDetailsDTO.getTableName()).append(" ( ");
             for (MetaDataDTO column : columnList) {
-                query.append(column.getColumnName()).append(" ").append(column.getDataType()).append(",");
+                if (flag) {
+                    query.append(", ");
+                }
+                query.append(column.getColumnName()).append(" ").append(column.getDataType());
+                flag = true;
+
             }
             query.append(")");
             System.out.println(query.toString());
@@ -229,7 +235,7 @@ public class PersistenceServiceImpl implements PersistenceService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return getDBInfo(projectDTO);
     }
 
     @Override
