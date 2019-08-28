@@ -66,7 +66,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 
     @Override
     public Project getProjectDetails(String projectId) {
-        return projectRepository.findProjectBy_id(projectId);
+        return projectRepository.findById(projectId).get();
     }
 
     /**

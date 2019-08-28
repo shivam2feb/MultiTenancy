@@ -12,7 +12,4 @@ public interface ProjectRepository extends MongoRepository<Project, String>{
 
 	public List<Project> findByUserId(String userId);
 
-
-	public Project findProjectBy_id(String projectId);
-
 }
