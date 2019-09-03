@@ -1,8 +1,9 @@
-package com.demo.repository;
+package com.app.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import com.demo.entity.*;
+import com.app.entity.*;
 
+<#assign EntityName = "${EntityName?cap_first}">
 public interface ${EntityName}Repository extends CrudRepository<${EntityName},${idType}>{
 
 }

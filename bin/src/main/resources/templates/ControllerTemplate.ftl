@@ -1,36 +1,38 @@
-package com.demo.controller;
+package com.app.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.demo.entity.*;
-import com.demo.service.TemplateService;
+import com.app.entity.*;
+import com.app.service.*;
 
+<#assign EntityName = "${EntityName?cap_first}">
 <#assign entityName = "${EntityName?uncap_first}">
+<#assign serviceName = "${entityName}Service">
 
-@RestController<#if controllerMapping??>(value="${controllerMapping}")</#if>
+@RestController<#if controllerMapping??>(value="${controllerMapping}")</#if> 
 public class ${EntityName}Controller {
 	
 	@Autowired
-	${EntityName}Service ${entityName}Service;
+	${EntityName}Service ${serviceName};
 	
 	@RequestMapping(value="/${entityName}/{id}",method=RequestMethod.GET)
 	public ${EntityName} get${EntityName}(@PathVariable ${idType} id) {
-		return templateService.get${EntityName}(id);
+		return ${serviceName}.get${EntityName}(id);
 	}
 	
 	@RequestMapping(value="/${entityName}",method=RequestMethod.POST)
 	public void add${EntityName}(@RequestBody ${EntityName} ${entityName}) {
-		templateService.add${EntityName}(${entityName});
+		${serviceName}.add${EntityName}(${entityName});
 	}
 	
 	@RequestMapping(value="/${entityName}",method=RequestMethod.PUT)
-	public void update${EntityName}(@RequestBody Model model) {
-		templateService.update${EntityName}(model);
+	public void update${EntityName}(@RequestBody ${EntityName} ${entityName}) {
+		${serviceName}.update${EntityName}(${entityName});
 	}
 	
 	@RequestMapping(value="/${entityName}/{id}}",method=RequestMethod.DELETE)
 	public void delete${EntityName}(@PathVariable ${idType} id) {
-		templateServcie.delete${EntityName}(id);
+		${serviceName}.delete${EntityName}(id);
 	}
 
 }

@@ -20,7 +20,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mfsi.appbuilder.document.API;
+import com.mfsi.appbuilder.master.document.API;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 
@@ -150,7 +150,7 @@ public class AppServiceImpl implements AppService {
 		Map<String, List<ApiJsonTemplate>> entitiesMap = new HashMap<>();
 
 		for (Iterator<ApiJsonTemplate> iterator = jsonString.iterator(); iterator.hasNext();) {
-			ApiJsonTemplate apiJsonTemplate = (ApiJsonTemplate) iterator.next();
+			ApiJsonTemplate apiJsonTemplate = iterator.next();
 			prepareApiJsonTemplateObj(entitiesMap, apiJsonTemplate);
 		}
 

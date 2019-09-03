@@ -1,13 +1,17 @@
 package com.mfsi.appbuilder.controller;
 
-import com.mfsi.appbuilder.document.API;
-import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.TableDetailsDTO;
+import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.service.PersistenceService;
+import com.mfsi.appbuilder.tenant.service.APIService;
 import com.mfsi.appbuilder.util.AppBuilderUtil;
+import com.mfsi.appbuilder.util.DataSourceUtil;
+import com.mfsi.appbuilder.util.MySQLDatabaseGenerator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +27,9 @@ public class ProjectController {
 
 	@Autowired
 	private PersistenceService persistenceService;
+	
+	@Autowired
+	private APIService apiService;
 
 	/**
 	 * getting all projects created by a user
@@ -47,6 +54,7 @@ public class ProjectController {
 			if(projectDTO.getWantSecurity())
 				persistenceService.createMatcherTable(conn);
 			conn.close();
+			MySQLDatabaseGenerator.createSchemaMetatdata(projectDTO.getDbDetailsDTO());
 		}
 		return persistenceService.saveProject(projectDTO);
 	}
@@ -86,6 +94,7 @@ public class ProjectController {
 	public void createAPI(@RequestBody ApiDto apiDTO) {
 		System.out.println("inside create");
 		persistenceService.createAPI(apiDTO);
+		apiService.saveAPI(apiDTO);
 	}
 	
 	/**

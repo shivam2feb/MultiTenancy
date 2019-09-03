@@ -1,9 +1,10 @@
 package com.mfsi.appbuilder.service;
 
 
-import com.mfsi.appbuilder.model.User;
+import com.mfsi.appbuilder.master.document.User;
+import com.mfsi.appbuilder.master.repository.UserDao;
 import com.mfsi.appbuilder.model.UserDto;
-import com.mfsi.appbuilder.repository.UserDao;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,9 +30,8 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Autowired
     private BCryptPasswordEncoder bcryptEncoder;
 
-    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.print(bcryptEncoder.encode("Abcd@1234"));
+   
         User user = userDao.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
