@@ -3,7 +3,7 @@ package com.mfsi.appbuilder.service;
 import java.util.List;
 import java.util.Map;
 
-import com.mfsi.appbuilder.document.API;
+import com.mfsi.appbuilder.master.document.API;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 

@@ -1,4 +1,4 @@
-package com.mfsi.appbuilder.model;
+package com.mfsi.appbuilder.master.document;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 

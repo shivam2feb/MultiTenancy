@@ -1,11 +1,11 @@
 package com.mfsi.appbuilder.service;
 
-import com.mfsi.appbuilder.document.API;
-import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.TableDetailsDTO;
+import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
 
 import java.sql.Connection;
 import java.util.List;

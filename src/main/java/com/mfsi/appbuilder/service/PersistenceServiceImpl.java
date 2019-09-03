@@ -1,13 +1,14 @@
 package com.mfsi.appbuilder.service;
 
-import com.mfsi.appbuilder.document.API;
-import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.TableDetailsDTO;
-import com.mfsi.appbuilder.repository.APIRepository;
-import com.mfsi.appbuilder.repository.ProjectRepository;
+import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
+import com.mfsi.appbuilder.master.repository.APIRepository;
+import com.mfsi.appbuilder.master.repository.ProjectRepository;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 
     @Override
     public Project getProjectDetails(String projectId) {
-        return projectRepository.findProjectBy_id(projectId);
+        return projectRepository.findById(projectId).get();
     }
 
     /**
@@ -144,7 +145,7 @@ public class PersistenceServiceImpl implements PersistenceService {
     /**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.mfsi.appbuilder.service.PersistenceService#pushSecurityUrls(com.mfsi.appbuilder.document.Project,
+	 * @see com.mfsi.appbuilder.service.PersistenceService#pushSecurityUrls(com.mfsi.appbuilder.master.document.Project,
 	 *      java.util.Set)
 	 * @author rohan used to push the security urls to specific database for
 	 *         bypassing urls from security else it will be protected.
