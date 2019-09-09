@@ -2,8 +2,8 @@ package com.app.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.app.entity.Matcher;
+import com.app.entity.API;
 
-public interface MatcherRepository extends JpaRepository<Matcher, Long>{
+public interface APIRepository extends JpaRepository<API, Integer>{
 
 }

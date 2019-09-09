@@ -7,20 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.app.entity.Matcher;
-import com.app.repository.MatcherRepository;
+import com.app.entity.API;
+import com.app.repository.APIRepository;
 
 @Configuration
 public class SecurityUrls {
 
 	@Autowired
-	MatcherRepository matcherRepository;
+	APIRepository apiRepository;
 
 	@Bean("securityUrlNames")
-	public List<Matcher> getSecuredUrls() {
-		List<Matcher> urlsList = new ArrayList<Matcher>();
-		urlsList = matcherRepository.findAll();
-		return urlsList;
+	public List<API> getSecuredUrls() {
+		List<API> apiList = new ArrayList<>();
+		apiList = apiRepository.findAll();
+		return apiList;
 	}
 
 }

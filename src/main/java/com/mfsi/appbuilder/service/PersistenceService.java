@@ -26,11 +26,7 @@ public interface PersistenceService {
 	public Map<String, List<MetaDataDTO>> getDBInfo(ProjectDTO projectDTO);
 
 	public Connection getMySqlConnection(String url, String username, String password) throws Exception;
-
 	
-	public void pushSecurityUrls(Project projectDetails, Set<String> securityUrls);
-	public boolean createMatcherTable(Connection conn);
-
 	public void updateAPI(ApiDto apiDTO);
 
 	public void deleteProject(String id);
