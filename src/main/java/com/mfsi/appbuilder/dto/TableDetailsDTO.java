@@ -7,6 +7,7 @@ public class TableDetailsDTO {
     private String tableName;
     private DBDetailsDTO dbDetailsDTO;
     private List<MetaDataDTO> metaDataDTOs;
+    private Boolean createFlow;
 
     public String getTableName() {
         return tableName;
@@ -30,5 +31,13 @@ public class TableDetailsDTO {
 
     public void setMetaDataDTOs(List<MetaDataDTO> metaDataDTOs) {
         this.metaDataDTOs = metaDataDTOs;
+    }
+
+    public Boolean isCreateFlow() {
+        return createFlow;
+    }
+
+    public void setCreateFlow(Boolean createFlow) {
+        this.createFlow = createFlow;
     }
 }
