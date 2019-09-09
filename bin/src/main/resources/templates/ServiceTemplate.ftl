@@ -1,7 +1,8 @@
-package com.demo.service;
+package com.app.service;
 
-import com.demo.entity.*;
+import com.app.entity.*;
 
+<#assign EntityName = "${EntityName?cap_first}">
 <#assign entityName = "${EntityName?uncap_first}">
 
 public interface ${EntityName}Service {

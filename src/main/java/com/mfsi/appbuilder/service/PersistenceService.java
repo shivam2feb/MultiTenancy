@@ -1,11 +1,11 @@
 package com.mfsi.appbuilder.service;
 
-import com.mfsi.appbuilder.document.API;
-import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.TableDetailsDTO;
+import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
 
 import java.sql.Connection;
 import java.util.List;
@@ -26,11 +26,7 @@ public interface PersistenceService {
 	public Map<String, List<MetaDataDTO>> getDBInfo(ProjectDTO projectDTO);
 
 	public Connection getMySqlConnection(String url, String username, String password) throws Exception;
-
 	
-	public void pushSecurityUrls(Project projectDetails, Set<String> securityUrls);
-	public boolean createMatcherTable(Connection conn);
-
 	public void updateAPI(ApiDto apiDTO);
 
 	public void deleteProject(String id);

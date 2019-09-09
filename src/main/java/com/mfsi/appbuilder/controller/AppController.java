@@ -6,10 +6,10 @@ package com.mfsi.appbuilder.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mfsi.appbuilder.document.API;
-import com.mfsi.appbuilder.document.Project;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
+import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
@@ -70,13 +70,8 @@ public class AppController {
 		
 		String dest = null;
 
-		Set<String> securityUrls = new HashSet<>();
-
 		// loop on all apis
 		for (API api : apis) {
-			
-			if(wantedSecurity)
-				securityUrls.add("/"+api.getApiUrl()+"/*");
 
 			// for creating the repository method name like findBy"something"
 			if (api.getApiType().equalsIgnoreCase("get"))
@@ -93,9 +88,6 @@ public class AppController {
 				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
 			}
 		}
-		if(wantedSecurity)
-			persistenceService.pushSecurityUrls(projectDetails, securityUrls);
-
 		Map<String, Object> appPropsMap = new HashMap<String, Object>();
 
 
@@ -176,7 +168,6 @@ public class AppController {
 	@PostMapping("/createProject1")
 	public boolean createProject1(@RequestBody String jsonString) {
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> jsonObject = new HashMap<>();
 		try {
 			mapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {
 			});

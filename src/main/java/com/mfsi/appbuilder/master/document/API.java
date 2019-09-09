@@ -1,4 +1,4 @@
-package com.mfsi.appbuilder.document;
+package com.mfsi.appbuilder.master.document;
 
 import java.util.List;
 

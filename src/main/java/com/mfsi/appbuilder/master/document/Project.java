@@ -1,4 +1,4 @@
-package com.mfsi.appbuilder.document;
+package com.mfsi.appbuilder.master.document;
 
 import com.mfsi.appbuilder.dto.DBDetailsDTO;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,6 +19,7 @@ public class Project {
 	
 	private String projectName;
 	private List<Map<String,String>> apiInfo=new ArrayList<>();
+	
     @LastModifiedDate
     private Date lastUpdatedOn;
     private String userId;

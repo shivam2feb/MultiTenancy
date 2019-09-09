@@ -1,8 +1,9 @@
-package com.mfsi.appbuilder.repository;
+package com.mfsi.appbuilder.master.repository;
 
-import com.mfsi.appbuilder.document.Project;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
+
+import com.mfsi.appbuilder.master.document.Project;
 
 import java.util.List;
 
@@ -11,8 +12,5 @@ public interface ProjectRepository extends MongoRepository<Project, String>{
 
 
 	public List<Project> findByUserId(String userId);
-
-
-	public Project findProjectBy_id(String projectId);
 
 }
