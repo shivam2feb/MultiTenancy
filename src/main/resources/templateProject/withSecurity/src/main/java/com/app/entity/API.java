@@ -1,4 +1,4 @@
-package com.mfsi.appbuilder.tenant.entity;
+package com.app.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

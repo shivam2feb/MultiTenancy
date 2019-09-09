@@ -70,13 +70,8 @@ public class AppController {
 		
 		String dest = null;
 
-		Set<String> securityUrls = new HashSet<>();
-
 		// loop on all apis
 		for (API api : apis) {
-			
-			if(wantedSecurity)
-				securityUrls.add("/"+api.getApiUrl()+"/*");
 
 			// for creating the repository method name like findBy"something"
 			if (api.getApiType().equalsIgnoreCase("get"))
@@ -93,9 +88,6 @@ public class AppController {
 				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
 			}
 		}
-		if(wantedSecurity)
-			persistenceService.pushSecurityUrls(projectDetails, securityUrls);
-
 		Map<String, Object> appPropsMap = new HashMap<String, Object>();
 
 
@@ -176,7 +168,6 @@ public class AppController {
 	@PostMapping("/createProject1")
 	public boolean createProject1(@RequestBody String jsonString) {
 		ObjectMapper mapper = new ObjectMapper();
-		Map<String, Object> jsonObject = new HashMap<>();
 		try {
 			mapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {
 			});

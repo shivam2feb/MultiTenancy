@@ -33,7 +33,7 @@ public final class DataSourceUtil {
         String tenantId = project.getProjectName();
         String tenantConnectionPoolName = tenantId + "-connection-pool";
         ds.setPoolName(tenantConnectionPoolName);
-        LOG.info("Configured datasource: {} . Connection poolname:{}" , project.getProjectName(), tenantConnectionPoolName);
+        LOG.info("Configured datasource: {} . Connection poolname:{}" , tenantId, tenantConnectionPoolName);
         return ds;
     }
 }

@@ -9,16 +9,21 @@ import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.service.PersistenceService;
 import com.mfsi.appbuilder.tenant.service.APIService;
 import com.mfsi.appbuilder.util.AppBuilderUtil;
-import com.mfsi.appbuilder.util.DataSourceUtil;
 import com.mfsi.appbuilder.util.MySQLDatabaseGenerator;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
 
 @RestController
 @RequestMapping("/project")
@@ -51,10 +56,8 @@ public class ProjectController {
 			projectDTO.getDbDetailsDTO().setVerified(false);
 		else {
 			projectDTO.getDbDetailsDTO().setVerified(true);
-			if(projectDTO.getWantSecurity())
-				persistenceService.createMatcherTable(conn);
 			conn.close();
-			MySQLDatabaseGenerator.createSchemaMetatdata(projectDTO.getDbDetailsDTO());
+			MySQLDatabaseGenerator.createSchemaMetatdata(projectDTO.getDbDetailsDTO(),"com.mfsi.appbuilder.tenant.entity");
 		}
 		return persistenceService.saveProject(projectDTO);
 	}
@@ -89,9 +92,11 @@ public class ProjectController {
 	 * method to create a new API for a project
 	 * author: shubham
 	 * @param apiDTO containing project id and api Json data
+	 * @throws SQLException 
 	 */
 	@PostMapping("/createAPI")
-	public void createAPI(@RequestBody ApiDto apiDTO) {
+	public void createAPI(@RequestBody ApiDto apiDTO) throws SQLException {
+		
 		System.out.println("inside create");
 		persistenceService.createAPI(apiDTO);
 		apiService.saveAPI(apiDTO);
@@ -104,7 +109,6 @@ public class ProjectController {
 	 */
 	@PostMapping("/updateAPI")
 	public void updateAPI(@RequestBody ApiDto apiDTO) {
-		System.out.println("inside update");
 		persistenceService.updateAPI(apiDTO);
 	}
 
@@ -145,7 +149,7 @@ public class ProjectController {
 
 	@PostMapping("/createTable")
     public Map<String, List<MetaDataDTO>> createTable(@RequestBody TableDetailsDTO dto) {
-        return persistenceService.createTable(dto);
+		return persistenceService.createTable(dto);
 	}
 
 }

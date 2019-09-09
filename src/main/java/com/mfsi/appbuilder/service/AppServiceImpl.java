@@ -353,12 +353,10 @@ public class AppServiceImpl implements AppService {
 
 	}
 
+	@Override
 	public void compileProject(String fileLocation) {
-
-	}
-
-	public static void runProcess(String command) throws IOException {
-		Process process = Runtime.getRuntime().exec(command);
+		// TODO Auto-generated method stub
+		
 	}
 
 }

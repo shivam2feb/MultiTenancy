@@ -8,6 +8,8 @@ import javax.sql.DataSource;
 import org.hibernate.engine.jdbc.connections.spi.AbstractDataSourceBasedMultiTenantConnectionProviderImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.master.repository.ProjectRepository;
@@ -28,20 +30,24 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDa
 	private Map<String, DataSource> dataSourcesMtApp = new TreeMap<>();
 
 	@Override
-	protected DataSource selectAnyDataSource() {
+	public DataSource selectAnyDataSource() {
 		if (dataSourcesMtApp.isEmpty()) {
 			List<Project> projects=projectRepository.findAll();
-			
+
 			for (Project project : projects) {
 				dataSourcesMtApp.put(project.getProjectName(),
 						DataSourceUtil.createAndConfigureDataSource(project));
 			}
 		}
-		return this.dataSourcesMtApp.values().iterator().next();
+		if(this.dataSourcesMtApp.size()>0)
+			return this.dataSourcesMtApp.values().iterator().next();
+		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
+		
+		return builder.setType(EmbeddedDatabaseType.DERBY).build();
 	}
 
 	@Override
-	protected DataSource selectDataSource(String tenantIdentifier) {
+	public DataSource selectDataSource(String tenantIdentifier) {
 
 		if (!this.dataSourcesMtApp.containsKey(tenantIdentifier)) {
 			List<Project> projects = projectRepository.findAll();

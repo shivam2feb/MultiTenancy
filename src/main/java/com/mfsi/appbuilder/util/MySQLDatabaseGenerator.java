@@ -13,7 +13,7 @@ import com.mfsi.appbuilder.dto.DBDetailsDTO;
  
 public class MySQLDatabaseGenerator {
  
-    public static void createSchemaMetatdata(DBDetailsDTO dbDetails) {
+    public static void createSchemaMetatdata(DBDetailsDTO dbDetails,String entityPackage) {
         Map<String, String> settings = new HashMap<>();
         settings.put("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
         settings.put("hibernate.connection.url", dbDetails.getDbURL());
@@ -26,7 +26,7 @@ public class MySQLDatabaseGenerator {
                 new StandardServiceRegistryBuilder()
                         .applySettings(settings)
                         .build());
-        CustomUtil.getClasses("com.mfsi.appbuilder.tenant.entity").forEach(metadata::addAnnotatedClass);
+        CustomUtil.getClasses(entityPackage).forEach(metadata::addAnnotatedClass);
         SchemaExport schemaExport = new SchemaExport();
         schemaExport.setHaltOnError(true);
         schemaExport.setFormat(true);
