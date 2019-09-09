@@ -1,12 +1,13 @@
 package com.mfsi.appbuilder.security;
 
-import com.mfsi.appbuilder.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.mfsi.appbuilder.master.document.User;
 
 import java.io.Serializable;
 import java.util.Arrays;

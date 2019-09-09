@@ -1,7 +1,7 @@
 package com.mfsi.appbuilder.service;
 
 
-import com.mfsi.appbuilder.model.User;
+import com.mfsi.appbuilder.master.document.User;
 import com.mfsi.appbuilder.model.UserDto;
 
 import java.util.List;

@@ -3,20 +3,18 @@ package com.mfsi.appbuilder.start;
 import com.mfsi.appbuilder.model.Parameter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@SpringBootApplication
-@ComponentScan(basePackages="com.mfsi")
-@EntityScan(basePackages="com.mfsi")
-@EnableMongoRepositories(basePackages="com.mfsi.appbuilder.repository")
+
+@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@ComponentScan(basePackages="com.mfsi.appbuilder")
 @EnableMongoAuditing
 public class AppBuilderApplication {
 

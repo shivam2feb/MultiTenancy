@@ -2,6 +2,7 @@ package com.app.security;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -19,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.app.entity.Matcher;
+import com.app.entity.API;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationEntryPoint unauthorizedHandler;
     
     @Autowired
-    List<Matcher> securityUrlNames;
+    List<API> apiList;
 
     @Override
     @Bean
@@ -54,8 +55,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-    	for (Matcher matcher : securityUrlNames) {
-    		http.authorizeRequests().antMatchers(matcher.getUrl()).permitAll();
+    	apiList=apiList.stream().filter(api-> api.isSecured()!=true).collect(Collectors.toList());
+    	for (API api : apiList) {
+    		http.authorizeRequests().antMatchers("/"+api.getApiUrl()+"/").permitAll();
 		}
         http.cors().and().csrf().disable().
                 authorizeRequests()
