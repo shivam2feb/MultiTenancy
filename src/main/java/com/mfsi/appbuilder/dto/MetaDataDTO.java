@@ -4,13 +4,25 @@ public class MetaDataDTO {
 
     private String columnName;
     private String dataType;
+    private boolean primaryKey;
+
+    public MetaDataDTO(String columnName, String dataType, String columnType) {
+        this.columnName = columnName;
+        this.dataType = dataType;
+        if (columnType.equals("PRI")) {
+            this.primaryKey = true;
+        }
+    }
+
+    public boolean getPrimaryKey() {
+        return primaryKey;
+    }
 
     public MetaDataDTO() {
     }
 
-    public MetaDataDTO(String columnName, String dataType) {
-        this.columnName = columnName;
-        this.dataType = dataType;
+    public void setPrimaryKey(boolean primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     public String getColumnName() {

@@ -1,20 +1,5 @@
 package com.mfsi.appbuilder.service;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
@@ -25,11 +10,24 @@ import com.mfsi.appbuilder.master.repository.APIRepository;
 import com.mfsi.appbuilder.master.repository.ProjectRepository;
 import com.mfsi.appbuilder.multitenant.config.DataSourceBasedMultiTenantConnectionProviderImpl;
 import com.mfsi.appbuilder.multitenant.config.TenantContextHolder;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class PersistenceServiceImpl implements PersistenceService {
 
-	private static final String SQL_DRIVER = "com.mysql.jdbc.Driver";
+    private static final String SQL_DRIVER = "com.mysql.jdbc.Driver";
+    private static final String CREATE_TABLE = "CREATE TABLE ";
+    private static final String ALTER_TABLE = "ALTER TABLE ";
+    private static final String ADD_COLUMN = " ADD COLUMN";
 
 	@Autowired
 	ProjectRepository projectRepository;
@@ -98,24 +96,32 @@ public class PersistenceServiceImpl implements PersistenceService {
 	@Override
 	public Map<String, List<MetaDataDTO>> getDBInfo(ProjectDTO projectDTO) {
 		Map<String, List<MetaDataDTO>> metaData = new HashMap<>();
-		List<MetaDataDTO> columns = null;
+        List<MetaDataDTO> columns;
+        PreparedStatement statement;
+        StringBuilder query = new StringBuilder();
+        String tableName;
 
-		try (Connection conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId());
-				ResultSet resultSet = conn.getMetaData().getColumns(projectDTO.getDbDetailsDTO().getSchema(), null, "%", "%");){
+        try (Connection conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId())) {
+            query.append("Select TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_KEY from Information_schema.columns WHERE\n" +
+                    "    TABLE_SCHEMA = ?");
+            statement = conn.prepareStatement(query.toString());
+            statement.setString(1, "ems_dev");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tableName = resultSet.getString("TABLE_NAME");
+                columns = metaData.get(tableName);
+                if (columns == null) {
+                    columns = new ArrayList<>();
+                    columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
+                    metaData.put(tableName, columns);
+                } else {
+                    columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
+                    //metaData.put(tableName, columns);
+                }
+            }
+            statement.close();
 
-			while (resultSet.next()) {
-				columns = metaData.get(resultSet.getString(3));
-				if (columns == null) {
-					columns = new ArrayList<>();
-					columns.add(new MetaDataDTO(resultSet.getString(4), resultSet.getString(6)));
-					metaData.put(resultSet.getString(3), columns);
-				} else {
-					columns.add(new MetaDataDTO(resultSet.getString(4), resultSet.getString(6)));
-					metaData.put(resultSet.getString(3), columns);
-				}
-			}
-
-		} catch (SQLException e) {
+        } catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return metaData;
@@ -173,36 +179,45 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
-	public Map<String, List<MetaDataDTO>> createTable(TableDetailsDTO tableDetailsDTO) {			
-		Connection conn = null;
-		Statement statement = null;
-		Boolean flag = false;
-		StringBuilder query = new StringBuilder("CREATE TABLE ");
-		ProjectDTO projectDTO = new ProjectDTO();
-		projectDTO.setDbDetailsDTO(tableDetailsDTO.getDbDetailsDTO());
-		try {
-			List<MetaDataDTO> columnList = tableDetailsDTO.getMetaDataDTOs();
-			query.append(tableDetailsDTO.getTableName()).append(" ( ");
-			for (MetaDataDTO column : columnList) {
-				if (flag) {
-					query.append(", ");
-				}
-				query.append(column.getColumnName()).append(" ").append(column.getDataType());
-				flag = true;
+    public Map<String, List<MetaDataDTO>> createTable(TableDetailsDTO tableDetailsDTO) {
+        Connection conn;
+        Statement statement;
+        Boolean flag = false;
+        StringBuilder query = new StringBuilder();
 
-			}
-			query.append(")");
-			System.out.println(query.toString());
+        ProjectDTO projectDTO = new ProjectDTO();
+        projectDTO.setDbDetailsDTO(tableDetailsDTO.getDbDetailsDTO());
+        try {
+            List<MetaDataDTO> columnList = tableDetailsDTO.getMetaDataDTOs();
+            if (tableDetailsDTO.isCreateFlow()) {
+                query.append(CREATE_TABLE);
+                query.append(tableDetailsDTO.getTableName());
+            } else {
+                query.append(ALTER_TABLE);
+                query.append(tableDetailsDTO.getTableName());
+                query.append(ADD_COLUMN);
+            }
+            query.append(" ( ");
+            for (MetaDataDTO column : columnList) {
+                if (flag) {
+                    query.append(", ");
+                }
+                query.append(column.getColumnName()).append(" ").append(column.getDataType());
+                flag = true;
 
-			conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId());
-			statement = conn.createStatement();
-			statement.executeUpdate(query.toString());
-			statement.close();
-			conn.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return getDBInfo(projectDTO);
+            }
+            query.append(")");
+            System.out.println(query.toString());
+
+            conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId());
+            statement = conn.createStatement();
+            statement.executeUpdate(query.toString());
+            statement.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return getDBInfo(projectDTO);
 	}
 
 	@Override
