@@ -97,23 +97,31 @@ public class PersistenceServiceImpl implements PersistenceService {
 	public Map<String, List<MetaDataDTO>> getDBInfo(ProjectDTO projectDTO) {
 		Map<String, List<MetaDataDTO>> metaData = new HashMap<>();
         List<MetaDataDTO> columns;
+        PreparedStatement statement;
+        StringBuilder query = new StringBuilder();
+        String tableName;
 
-		try (Connection conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId());
-             ResultSet resultSet = conn.getMetaData().getColumns(projectDTO.getDbDetailsDTO().getSchema(), null, "%", "%")) {
+        try (Connection conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId())) {
+            query.append("Select TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_KEY from Information_schema.columns WHERE\n" +
+                    "    TABLE_SCHEMA = ?");
+            statement = conn.prepareStatement(query.toString());
+            statement.setString(1, "ems_dev");
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                tableName = resultSet.getString("TABLE_NAME");
+                columns = metaData.get(tableName);
+                if (columns == null) {
+                    columns = new ArrayList<>();
+                    columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
+                    metaData.put(tableName, columns);
+                } else {
+                    columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
+                    //metaData.put(tableName, columns);
+                }
+            }
+            statement.close();
 
-			while (resultSet.next()) {
-				columns = metaData.get(resultSet.getString(3));
-				if (columns == null) {
-					columns = new ArrayList<>();
-					columns.add(new MetaDataDTO(resultSet.getString(4), resultSet.getString(6)));
-					metaData.put(resultSet.getString(3), columns);
-				} else {
-					columns.add(new MetaDataDTO(resultSet.getString(4), resultSet.getString(6)));
-					metaData.put(resultSet.getString(3), columns);
-				}
-			}
-
-		} catch (SQLException e) {
+        } catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return metaData;
