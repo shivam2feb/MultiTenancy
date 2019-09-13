@@ -20,7 +20,7 @@ public class ApiDto {
 	private String mainEntityIdType;
 	private List<ApiJsonTemplate> getParams;
 
-	private boolean isSecured = true;
+	private boolean secured;
 	
 	
 
@@ -36,7 +36,7 @@ public class ApiDto {
 		result = prime * result + ((apiUrl == null) ? 0 : apiUrl.hashCode());
 		result = prime * result + ((getParams == null) ? 0 : getParams.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + (isSecured ? 1231 : 1237);
+		result = prime * result + (secured ? 1231 : 1237);
 		result = prime * result + ((jsonString == null) ? 0 : jsonString.hashCode());
 		result = prime * result + ((mainEntityIdType == null) ? 0 : mainEntityIdType.hashCode());
 		result = prime * result + ((mainEntityName == null) ? 0 : mainEntityName.hashCode());
@@ -82,7 +82,7 @@ public class ApiDto {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (isSecured != other.isSecured)
+		if (secured != other.secured)
 			return false;
 		if (jsonString == null) {
 			if (other.jsonString != null)
@@ -113,11 +113,11 @@ public class ApiDto {
 	}
 
 	public boolean isSecured() {
-		return isSecured;
+		return secured;
 	}
 
-	public void setSecured(boolean isSecured) {
-		this.isSecured = isSecured;
+	public void setSecured(boolean secured) {
+		this.secured = secured;
 	}
 	private String reJson;
 	

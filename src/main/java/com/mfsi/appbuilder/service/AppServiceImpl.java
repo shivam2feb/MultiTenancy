@@ -186,6 +186,7 @@ public class AppServiceImpl implements AppService {
 		} else {
 			// add it to list and send it to recursion.
 			ObjectMapper mapper = new ObjectMapper();
+			@SuppressWarnings("unchecked")
 			List<ApiJsonTemplate> nestedList = (List<ApiJsonTemplate>) apiJsonTemplate.getDataType();
 
 			String entityName = apiJsonTemplate.getEntityName();

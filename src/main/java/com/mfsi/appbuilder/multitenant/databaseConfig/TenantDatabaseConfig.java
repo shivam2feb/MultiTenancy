@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mfsi.appbuilder.multitenant.config.CurrentTenantIdentifierResolverImpl;
 import com.mfsi.appbuilder.multitenant.config.DataSourceBasedMultiTenantConnectionProviderImpl;
-import com.mfsi.appbuilder.tenant.entity.API;
+import com.mfsi.appbuilder.tenant.entity.TenantAPI;
 import com.mfsi.appbuilder.tenant.repository.TenantAPIRepository;
 
 @Configuration
@@ -86,7 +86,7 @@ public class TenantDatabaseConfig {
 		LocalContainerEntityManagerFactoryBean emfBean = new LocalContainerEntityManagerFactoryBean();
 		//All tenant related entities, repositories and service classes must be scanned
 		emfBean.setPackagesToScan(
-				API.class.getPackage().getName(),
+				TenantAPI.class.getPackage().getName(),
 				TenantAPIRepository.class.getPackage().getName()
 				//,ActorService.class.getPackage().getName()
 				);

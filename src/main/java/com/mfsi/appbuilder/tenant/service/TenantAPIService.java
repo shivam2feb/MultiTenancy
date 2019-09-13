@@ -1,8 +1,15 @@
 package com.mfsi.appbuilder.tenant.service;
 
+import java.util.List;
+
 import com.mfsi.appbuilder.dto.ApiDto;
+import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.tenant.entity.TenantAPI;
 
-public interface APIService {
+public interface TenantAPIService {
 
-	public void saveAPI(ApiDto apiDto);
+	public void saveAPIs(List<API> api);
+	public void saveAPI(ApiDto apiDTO);
+	public TenantAPI findAPIbyURL(String url);
+	public void updateAPI(ApiDto apiDto,TenantAPI preAPI);
 }

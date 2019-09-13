@@ -105,7 +105,7 @@ public class PersistenceServiceImpl implements PersistenceService {
             query.append("Select TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_KEY from Information_schema.columns WHERE\n" +
                     "    TABLE_SCHEMA = ?");
             statement = conn.prepareStatement(query.toString());
-            statement.setString(1, "ems_dev");
+            statement.setString(1, projectDTO.getDbDetailsDTO().getSchema());
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 tableName = resultSet.getString("TABLE_NAME");
@@ -161,19 +161,8 @@ public class PersistenceServiceImpl implements PersistenceService {
 
 	@Override
 	public void updateAPI(ApiDto apiDTO) {
-		// TODO Auto-generated method stub
 		API api = new API();
-		api.setId(apiDTO.getId());
-		api.setApiName(apiDTO.getApiName());
-		api.setApiType(apiDTO.getApiType());
-		api.setJsonString(apiDTO.getJsonString());
-		api.setProjectId(apiDTO.getProjectId());
-		api.setProjectName(apiDTO.getProjectName());
-		api.setMainEntityIdType(apiDTO.getMainEntityIdType());
-		api.setMainEntityName(apiDTO.getMainEntityName());
-		api.setApiUrl(apiDTO.getApiUrl());
-		api.setGetParams(apiDTO.getGetParams());
-		api.setReJson(apiDTO.getReJson());
+		BeanUtils.copyProperties(apiDTO, api);
 		apiRepository.save(api);
 
 	}
@@ -223,6 +212,15 @@ public class PersistenceServiceImpl implements PersistenceService {
 	@Override
 	public void deleteProject(String id) {
 		projectRepository.deleteById(id);
+	}
+	
+	public API findAPIByURL(String apiUrl) {
+		
+		return apiRepository.findByApiUrl(apiUrl);
+	}
+	
+	public API findAPIById(String id) {
+		return apiRepository.findById(id).get();
 	}
 
 }

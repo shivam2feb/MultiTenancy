@@ -15,6 +15,9 @@ import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
 import com.mfsi.appbuilder.service.AppServiceImpl;
 import com.mfsi.appbuilder.service.PersistenceService;
+import com.mfsi.appbuilder.tenant.service.TenantAPIService;
+import com.mfsi.appbuilder.util.MySQLDatabaseGenerator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +46,9 @@ public class AppController {
 
 	@Value("${destinationSource}")
 	private String destination;
+	
+	@Autowired
+	private TenantAPIService tenantApiService;
 
 	/**
 	 * saving destination and project name for storing zip 
@@ -69,7 +75,7 @@ public class AppController {
 		Boolean wantedSecurity = projectDetails.getWantSecurity();
 		
 		String dest = null;
-
+		
 		// loop on all apis
 		for (API api : apis) {
 
@@ -81,7 +87,7 @@ public class AppController {
 
 			this.projectName = api.getProjectName();
 			this.dest = dest;
-
+			
 			if (appService.copyFolder(src, dest, wantedSecurity)) {
 
 				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
