@@ -21,8 +21,8 @@ public class ApiDto {
 	private List<ApiJsonTemplate> getParams;
 
 	private boolean secured;
-	
-	
+
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
@@ -120,10 +120,10 @@ public class ApiDto {
 		this.secured = secured;
 	}
 	private String reJson;
-	
-	
 
-	
+
+
+
 	public String getReJson() {
 		return reJson;
 	}

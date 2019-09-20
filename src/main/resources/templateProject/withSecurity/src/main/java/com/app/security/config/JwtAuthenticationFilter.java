@@ -1,4 +1,4 @@
-package com.app.security;
+package com.app.security.config;
 
 import java.io.IOException;
 import java.util.Arrays;

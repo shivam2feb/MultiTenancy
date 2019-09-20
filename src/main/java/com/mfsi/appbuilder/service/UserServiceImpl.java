@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        return new com.mfsi.appbuilder.dto.User(String.valueOf(user.getId()), user.getUsername(), user.getPassword(), getAuthority());
+        return new com.mfsi.appbuilder.dto.AppUser(String.valueOf(user.getId()), user.getUsername(), user.getPassword(), getAuthority());
     }
 
     private List<SimpleGrantedAuthority> getAuthority() {

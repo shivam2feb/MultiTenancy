@@ -1,4 +1,4 @@
-package com.app.security;
+package com.app.security.config;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.app.entity.User;
+import com.app.security.entity.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

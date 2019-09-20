@@ -1,15 +1,18 @@
-package com.app.dto;
-
-import java.util.Collection;
+package com.mfsi.appbuilder.dto;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public class User extends org.springframework.security.core.userdetails.User {
-	
+import java.util.Collection;
+
+public class AppUser extends org.springframework.security.core.userdetails.User {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 318464288154968852L;
 	private String userId;
     private String token;
 
-    public User(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public AppUser(String id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.userId = id;
     }

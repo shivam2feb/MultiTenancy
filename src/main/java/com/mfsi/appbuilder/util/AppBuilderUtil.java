@@ -1,17 +1,17 @@
 package com.mfsi.appbuilder.util;
 
-import com.mfsi.appbuilder.dto.User;
+import com.mfsi.appbuilder.dto.AppUser;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class AppBuilderUtil {
 
     public static String getLoggedInUsername() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AppUser user = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user.getUsername();
     }
 
     public static String getLoggedInUserId() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        AppUser user = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return user.getUserId();
     }
 }

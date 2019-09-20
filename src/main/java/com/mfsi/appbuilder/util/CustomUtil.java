@@ -7,16 +7,18 @@ import java.util.Enumeration;
 import java.util.List;
 
 public class CustomUtil {
+	
+	private CustomUtil() {}
 
-	public static List<Class> getClasses(String packageName){
+	public static List<Class<?>> getClasses(String packageName){
 		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-		ArrayList<Class> classes = new ArrayList<Class>();
+		ArrayList<Class<?>> classes = new ArrayList<>();
 		String path = packageName.replace('.', '/');
 		try {
-			Enumeration resources = classLoader.getResources(path);
+			Enumeration<URL> resources = classLoader.getResources(path);
 			List<File> dirs = new ArrayList<>();
 			while (resources.hasMoreElements()) {
-				URL resource = (URL) resources.nextElement();
+				URL resource = resources.nextElement();
 				dirs.add(new File(resource.getFile()));
 			}
 			
@@ -30,8 +32,8 @@ public class CustomUtil {
 
 	}
 
-	private static List<Class> findClasses(File directory, String packageName) throws ClassNotFoundException {
-		List<Class> classes = new ArrayList<>();
+	private static List<Class<?>> findClasses(File directory, String packageName) throws ClassNotFoundException {
+		List<Class<?>> classes = new ArrayList<>();
 		if (!directory.exists()) {
 			return classes;
 		}
