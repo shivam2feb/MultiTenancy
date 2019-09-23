@@ -47,4 +47,9 @@ public class TenantAPIServiceImpl implements TenantAPIService{
 		apiRepo.save(tenantAPI);
 		
 	}
+	
+	@Override
+	public void deleteByUrl(String url) {
+		apiRepo.removeByApiUrl(url);
+	}
 }

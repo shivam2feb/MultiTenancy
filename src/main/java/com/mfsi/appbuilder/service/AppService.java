@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 
@@ -19,4 +20,7 @@ public interface AppService {
 	public String createMethodName(List<ApiJsonTemplate> getParams);
 	public void generateFileFromTemplateV2(Map<String, Object> map, String templateType, String templateName,
 			String location, String fileName,String fileExt);
+	
+	public void createGenerateTokenAPI(Project project);
+	public void createUserEntityForSecurity(API api,String dest);
 }

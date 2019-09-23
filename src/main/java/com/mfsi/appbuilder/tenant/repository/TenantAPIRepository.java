@@ -9,4 +9,5 @@ import com.mfsi.appbuilder.tenant.entity.TenantAPI;
 public interface TenantAPIRepository extends JpaRepository<TenantAPI, Integer>{
 	
 	public TenantAPI findByApiUrl(String url);
+	public void removeByApiUrl(String url);
 }

@@ -22,6 +22,7 @@ import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.TableDetailsDTO;
 import com.mfsi.appbuilder.master.document.API;
 import com.mfsi.appbuilder.master.document.Project;
+import com.mfsi.appbuilder.service.AppService;
 import com.mfsi.appbuilder.service.PersistenceService;
 import com.mfsi.appbuilder.tenant.service.TenantAPIService;
 import com.mfsi.appbuilder.util.AppBuilderUtil;
@@ -34,10 +35,12 @@ public class ProjectController {
 
 	@Autowired
 	private PersistenceService persistenceService;
-	
+
 	@Autowired
 	private TenantAPIService tenantAPIService;
-	
+
+	@Autowired
+	private AppService appService;
 
 	/**
 	 * getting all projects created by a user
@@ -52,7 +55,7 @@ public class ProjectController {
 
 	@PostMapping("/create")
 	private Project createProject(@RequestBody ProjectDTO projectDTO, Principal principal) throws Exception {
-        projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
+		projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
 		Connection conn = persistenceService.getMySqlConnection(projectDTO.getDbDetailsDTO().getDbURL(), projectDTO.getDbDetailsDTO().getDbUsername()
 				, projectDTO.getDbDetailsDTO().getDbPassword());
 		if (conn == null)
@@ -62,7 +65,10 @@ public class ProjectController {
 			conn.close();
 			MySQLDatabaseGenerator.createSchemaMetatdata(projectDTO.getDbDetailsDTO(),"com.mfsi.appbuilder.tenant.entity");
 		}
-		return persistenceService.saveProject(projectDTO);
+		Project project = persistenceService.saveProject(projectDTO);
+		if(project.getWantSecurity())
+			appService.createGenerateTokenAPI(project);
+		return project;
 	}
 
 	/**
@@ -99,12 +105,12 @@ public class ProjectController {
 	 */
 	@PostMapping("/createAPI")
 	public void createAPI(@RequestBody ApiDto apiDTO) throws SQLException {
-		
+
 		System.out.println("inside create");
 		persistenceService.createAPI(apiDTO);
 		tenantAPIService.saveAPI(apiDTO);
 	}
-	
+
 	/**
 	 * method to create a new API for a project
 	 * author: shubham
@@ -128,7 +134,7 @@ public class ProjectController {
 	public List<API> getAPI(@PathVariable String projectId) {
 		return persistenceService.getAPI(projectId);
 	}
-	
+
 	/**
 	 * Method for permanently delete the api
 	 * author: shubham
@@ -136,8 +142,9 @@ public class ProjectController {
 	 */
 	@PostMapping("/deleteApi")
 	public void deleteAPI(@RequestBody ApiDto api) {
-		
+
 		persistenceService.deleteApi(api.getId());
+		tenantAPIService.deleteByUrl(api.getApiUrl());
 	}
 
 	/**
@@ -153,7 +160,7 @@ public class ProjectController {
 	}
 
 	@PostMapping("/createTable")
-    public Map<String, List<MetaDataDTO>> createTable(@RequestBody TableDetailsDTO dto) {
+	public Map<String, List<MetaDataDTO>> createTable(@RequestBody TableDetailsDTO dto) {
 		return persistenceService.createTable(dto);
 	}
 

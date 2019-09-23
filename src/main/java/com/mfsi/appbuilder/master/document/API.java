@@ -1,5 +1,6 @@
 package com.mfsi.appbuilder.master.document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,7 +12,7 @@ public class API {
 	private String id;
 	private String apiName;
 	private String apiType;
-	private List<ApiJsonTemplate> jsonString;
+	private List<ApiJsonTemplate> jsonString=new ArrayList<>();
 	private String projectName;
 	private String projectId;
 	private String apiUrl;
@@ -19,7 +20,7 @@ public class API {
 	private String mainEntityIdType;
 	private List<ApiJsonTemplate> getParams;
 	private boolean secured;
-	
+	private String reJson;
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -119,7 +120,7 @@ public class API {
 		this.secured = isSecured;
 	}
 
-	private String reJson;
+	
 	
 	
 	public String getReJson() {

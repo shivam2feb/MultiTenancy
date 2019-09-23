@@ -12,4 +12,5 @@ public interface TenantAPIService {
 	public void saveAPI(ApiDto apiDTO);
 	public TenantAPI findAPIbyURL(String url);
 	public void updateAPI(ApiDto apiDto,TenantAPI preAPI);
+	public void deleteByUrl(String url);
 }

@@ -24,10 +24,12 @@ import java.util.Map;
 @Service
 public class PersistenceServiceImpl implements PersistenceService {
 
-    private static final String SQL_DRIVER = "com.mysql.jdbc.Driver";
-    private static final String CREATE_TABLE = "CREATE TABLE ";
-    private static final String ALTER_TABLE = "ALTER TABLE ";
-    private static final String ADD_COLUMN = " ADD COLUMN";
+	private static final String SQL_DRIVER = "com.mysql.jdbc.Driver";
+	private static final String CREATE_TABLE = "CREATE TABLE ";
+	private static final String ALTER_TABLE = "ALTER TABLE ";
+	private static final String ADD_COLUMN = " ADD COLUMN";
+	private static final String PRIMARY_KEY = " PRIMARY KEY (";
+	private static final String COMMA = " , ";
 
 	@Autowired
 	ProjectRepository projectRepository;
@@ -66,16 +68,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 	@Override
 	public void createAPI(ApiDto apiDTO) {
 		API api = new API();
-		api.setApiName(apiDTO.getApiName());
-		api.setApiType(apiDTO.getApiType());
-		api.setJsonString(apiDTO.getJsonString());
-		api.setProjectId(apiDTO.getProjectId());
-		api.setProjectName(apiDTO.getProjectName());
-		api.setMainEntityIdType(apiDTO.getMainEntityIdType());
-		api.setMainEntityName(apiDTO.getMainEntityName());
-		api.setApiUrl(apiDTO.getApiUrl());
-		api.setGetParams(apiDTO.getGetParams());
-		api.setReJson(apiDTO.getReJson());
+		BeanUtils.copyProperties(apiDTO, api);
 		apiRepository.save(api);
 	}
 
@@ -96,32 +89,32 @@ public class PersistenceServiceImpl implements PersistenceService {
 	@Override
 	public Map<String, List<MetaDataDTO>> getDBInfo(ProjectDTO projectDTO) {
 		Map<String, List<MetaDataDTO>> metaData = new HashMap<>();
-        List<MetaDataDTO> columns;
-        PreparedStatement statement;
-        StringBuilder query = new StringBuilder();
-        String tableName;
+		List<MetaDataDTO> columns;
+		PreparedStatement statement;
+		StringBuilder query = new StringBuilder();
+		String tableName;
 
-        try (Connection conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId())) {
-            query.append("Select TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_KEY from Information_schema.columns WHERE\n" +
-                    "    TABLE_SCHEMA = ?");
-            statement = conn.prepareStatement(query.toString());
-            statement.setString(1, projectDTO.getDbDetailsDTO().getSchema());
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                tableName = resultSet.getString("TABLE_NAME");
-                columns = metaData.get(tableName);
-                if (columns == null) {
-                    columns = new ArrayList<>();
-                    columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
-                    metaData.put(tableName, columns);
-                } else {
-                    columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
-                    //metaData.put(tableName, columns);
-                }
-            }
-            statement.close();
+		try (Connection conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId())) {
+			query.append("Select TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_KEY from Information_schema.columns WHERE\n" +
+					"    TABLE_SCHEMA = ?");
+			statement = conn.prepareStatement(query.toString());
+			statement.setString(1, projectDTO.getDbDetailsDTO().getSchema());
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				tableName = resultSet.getString("TABLE_NAME");
+				columns = metaData.get(tableName);
+				if (columns == null) {
+					columns = new ArrayList<>();
+					columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
+					metaData.put(tableName, columns);
+				} else {
+					columns.add(new MetaDataDTO(resultSet.getString("COLUMN_NAME"), resultSet.getString("DATA_TYPE"), resultSet.getString("COLUMN_KEY")));
+					//metaData.put(tableName, columns);
+				}
+			}
+			statement.close();
 
-        } catch (SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return metaData;
@@ -168,57 +161,66 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
-    public Map<String, List<MetaDataDTO>> createTable(TableDetailsDTO tableDetailsDTO) {
-        Connection conn;
-        Statement statement;
-        Boolean flag = false;
-        StringBuilder query = new StringBuilder();
+	public Map<String, List<MetaDataDTO>> createTable(TableDetailsDTO tableDetailsDTO) {
+		Connection conn;
+		Statement statement;
+		Boolean flag = false;
+		StringBuilder query = new StringBuilder();
+		StringBuilder constrainQuery = new StringBuilder(PRIMARY_KEY);
+		ProjectDTO projectDTO = new ProjectDTO();
+		projectDTO.setDbDetailsDTO(tableDetailsDTO.getDbDetailsDTO());
+		try {
+			List<MetaDataDTO> columnList = tableDetailsDTO.getMetaDataDTOs();
+			if (tableDetailsDTO.isCreateFlow()) {
+				query.append(CREATE_TABLE);
+				query.append(tableDetailsDTO.getTableName());
+			} else {
+				query.append(ALTER_TABLE);
+				query.append(tableDetailsDTO.getTableName());
+				query.append(ADD_COLUMN);
+			}
+			query.append(" ( ");
+			for (MetaDataDTO column : columnList) {
+				if (flag) {
+					query.append(COMMA);
+				}
+				query.append(column.getColumnName()).append(" ").append(column.getDataType());
+				if(column.getPrimaryKey()){
+					if(!constrainQuery.equals(PRIMARY_KEY))
+						constrainQuery.append(column.getColumnName());
+					else
+						constrainQuery.append(COMMA).append(column.getColumnName());
+				}
+				flag = true;
 
-        ProjectDTO projectDTO = new ProjectDTO();
-        projectDTO.setDbDetailsDTO(tableDetailsDTO.getDbDetailsDTO());
-        try {
-            List<MetaDataDTO> columnList = tableDetailsDTO.getMetaDataDTOs();
-            if (tableDetailsDTO.isCreateFlow()) {
-                query.append(CREATE_TABLE);
-                query.append(tableDetailsDTO.getTableName());
-            } else {
-                query.append(ALTER_TABLE);
-                query.append(tableDetailsDTO.getTableName());
-                query.append(ADD_COLUMN);
-            }
-            query.append(" ( ");
-            for (MetaDataDTO column : columnList) {
-                if (flag) {
-                    query.append(", ");
-                }
-                query.append(column.getColumnName()).append(" ").append(column.getDataType());
-                flag = true;
+			}
+			if(!constrainQuery.equals(PRIMARY_KEY))
+				query.append(COMMA).append(constrainQuery).append(")");
+			query.append(")");
+			System.out.println(query.toString());
 
-            }
-            query.append(")");
-            System.out.println(query.toString());
-
-            conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId());
-            statement = conn.createStatement();
-            statement.executeUpdate(query.toString());
-            statement.close();
-            conn.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return getDBInfo(projectDTO);
+			conn = multiTenantDataSorce.getConnection(TenantContextHolder.getTenantId());
+			statement = conn.createStatement();
+			statement.executeUpdate(query.toString());
+			statement.close();
+			conn.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return getDBInfo(projectDTO);
 	}
 
 	@Override
 	public void deleteProject(String id) {
 		projectRepository.deleteById(id);
+		apiRepository.deleteByProjectId(id);
 	}
-	
+
 	public API findAPIByURL(String apiUrl) {
-		
+
 		return apiRepository.findByApiUrl(apiUrl);
 	}
-	
+
 	public API findAPIById(String id) {
 		return apiRepository.findById(id).get();
 	}

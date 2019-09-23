@@ -88,24 +88,30 @@ public class AppController {
 		Boolean wantedSecurity = projectDetails.getWantSecurity();
 		
 		String dest = null;
+		this.projectName = projectDetails.getProjectName();
 		
+		dest = destination + File.separator + projectName;
+		this.dest = dest;
+		appService.copyFolder(src, dest, wantedSecurity);
 		// loop on all apis
 		for (API api : apis) {
-
+			if(api.getApiUrl().equals("token/generate-token")) {
+				appService.createUserEntityForSecurity(api,dest);
+				continue;
+			}
 			// for creating the repository method name like findBy"something"
 			if (api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
 
-			dest = destination + File.separator + api.getProjectName();
-
-			this.projectName = api.getProjectName();
-			this.dest = dest;
 			
-			if (appService.copyFolder(src, dest, wantedSecurity)) {
+
+			
+			
+			
 
 				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
 				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
-			}
+			
 		}
 		Map<String, Object> appPropsMap = new HashMap<String, Object>();
 

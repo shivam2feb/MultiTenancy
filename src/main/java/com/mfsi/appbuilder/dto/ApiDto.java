@@ -1,5 +1,6 @@
 package com.mfsi.appbuilder.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -12,7 +13,7 @@ public class ApiDto {
 	private String id;
 	private String apiName;
 	private String apiType;
-	private List<ApiJsonTemplate> jsonString;
+	private List<ApiJsonTemplate> jsonString=new ArrayList<>();
 	private String projectName;
 	private String projectId;
 	private String apiUrl;

@@ -10,25 +10,37 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.master.document.API;
+import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
+import com.mfsi.appbuilder.tenant.service.TenantAPIService;
+import com.mongodb.client.model.Field;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @Service
 public class AppServiceImpl implements AppService {
+	
+	@Autowired
+	private PersistenceService persistenceService;
+
+	@Autowired
+	private TenantAPIService tenantAPIService;
 
 	@Value("classpath:templateProject")
 	private String src;
@@ -358,6 +370,51 @@ public class AppServiceImpl implements AppService {
 	public void compileProject(String fileLocation) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void createGenerateTokenAPI(Project project) {
+		ApiDto api= new ApiDto();
+		api.setApiName("generate-token");
+		api.setApiType("POST");
+		api.setProjectName(project.getProjectName());
+		api.setProjectId(project.get_id());
+		api.setApiUrl("token/generate-token");
+		api.setSecured(false);
+	
+		ApiJsonTemplate jsonTemplate1 = new ApiJsonTemplate();
+		jsonTemplate1.getAdditionalProperties().put("keyName", "username");
+		
+		ApiJsonTemplate jsonTemplate2 = new ApiJsonTemplate();
+		jsonTemplate2.getAdditionalProperties().put("keyName", "password");
+		
+		api.getJsonString().add(jsonTemplate1);
+		api.getJsonString().add(jsonTemplate2);
+		
+		api.setReJson("{\"username\": \"appBuilder\",\"password\" :\"appBuilder\"} ");
+		persistenceService.createAPI(api);
+		tenantAPIService.saveAPI(api);
+	}
+	
+	public void createUserEntityForSecurity(API api,String dest) {
+		Map<String,Object> map = new HashMap<>();
+		map.put("tableName", api.getMainEntityName());
+		for(ApiJsonTemplate apiJson:api.getJsonString()) {
+			String key = apiJson.getAdditionalProperties().values().iterator().next().toString();
+			switch(key) {
+			case "id": 
+				map.put("idColumn", apiJson.getColumnName());
+				break;
+			case "username":
+				map.put("userNameColumn", apiJson.getColumnName());
+				break;
+			case "password":
+				map.put("passwordColumn", apiJson.getColumnName());
+				break;
+			}
+		}
+		String basePackage= BASE_PACKAGE.substring(0, BASE_PACKAGE.lastIndexOf(File.separator));
+		generateFileFromTemplateV2(map, "security", "User.ftl", dest+File.separator+(BASE_JAVA_FOLDER + basePackage), "entity"+File.separator+"User", ".java");
 	}
 
 }
