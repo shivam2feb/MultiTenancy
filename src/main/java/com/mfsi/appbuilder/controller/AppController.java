@@ -62,7 +62,7 @@ public class AppController {
 
 	@Value("${destinationSource}")
 	private String destination;
-	
+
 	/**
 	 * saving destination and project name for storing zip 
 	 */
@@ -86,10 +86,10 @@ public class AppController {
 		List<API> apis = persistenceService.getAPI(projectId);
 		Project projectDetails = persistenceService.getProjectDetails(projectId);
 		Boolean wantedSecurity = projectDetails.getWantSecurity();
-		
+
 		String dest = null;
 		this.projectName = projectDetails.getProjectName();
-		
+
 		dest = destination + File.separator + projectName;
 		this.dest = dest;
 		appService.copyFolder(src, dest, wantedSecurity);
@@ -102,18 +102,11 @@ public class AppController {
 			// for creating the repository method name like findBy"something"
 			if (api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
+			Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
+			appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
 
-			
-
-			
-			
-			
-
-				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
-				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
-			
 		}
-		Map<String, Object> appPropsMap = new HashMap<String, Object>();
+		Map<String, Object> appPropsMap = new HashMap<>();
 
 
 		appPropsMap.put("db_schemaname", projectDetails.getDbDetailsDTO().getSchema());
@@ -159,7 +152,7 @@ public class AppController {
 		 * method call for deleting the project folder after zip has been created
 		 */
 		this.recursiveDelete(new File(folder));
-		
+
 		/**
 		 * method call for deleting the zip after download
 		 */

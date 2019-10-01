@@ -1,9 +1,9 @@
 package com.mfsi.appbuilder.util;
 
-import java.sql.SQLSyntaxErrorException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
@@ -36,7 +36,6 @@ public class MySQLDatabaseGenerator {
 		try {
 			schemaExport.createOnly(EnumSet.of(TargetType.DATABASE),metadata.buildMetadata() );
 		}catch(Exception e) {
-			//e.printStackTrace();
 			System.out.println(e.getCause().getCause());
 		}
 

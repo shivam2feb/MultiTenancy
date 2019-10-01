@@ -148,7 +148,6 @@ public class PersistenceServiceImpl implements PersistenceService {
 
 	@Override
 	public void deleteApi(String apiId) {
-		// TODO Auto-generated method stub
 		apiRepository.deleteById(apiId);
 	}
 

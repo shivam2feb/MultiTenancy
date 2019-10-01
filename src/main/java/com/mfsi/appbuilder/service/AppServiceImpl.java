@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,6 @@ import com.mfsi.appbuilder.master.document.Project;
 import com.mfsi.appbuilder.model.ApiJsonTemplate;
 import com.mfsi.appbuilder.model.Model;
 import com.mfsi.appbuilder.tenant.service.TenantAPIService;
-import com.mongodb.client.model.Field;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -401,6 +399,8 @@ public class AppServiceImpl implements AppService {
 		map.put("tableName", api.getMainEntityName());
 		for(ApiJsonTemplate apiJson:api.getJsonString()) {
 			String key = apiJson.getAdditionalProperties().values().iterator().next().toString();
+			if(apiJson.getIsPrimaryKey())
+				key="id";
 			switch(key) {
 			case "id": 
 				map.put("idColumn", apiJson.getColumnName());
