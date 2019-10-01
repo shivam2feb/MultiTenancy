@@ -1,29 +1,32 @@
 package com.mfsi.appbuilder.controller;
 
+import java.security.Principal;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.mfsi.appbuilder.dto.ApiDto;
 import com.mfsi.appbuilder.dto.MetaDataDTO;
 import com.mfsi.appbuilder.dto.ProjectDTO;
 import com.mfsi.appbuilder.dto.TableDetailsDTO;
 import com.mfsi.appbuilder.master.document.API;
 import com.mfsi.appbuilder.master.document.Project;
+import com.mfsi.appbuilder.service.AppService;
 import com.mfsi.appbuilder.service.PersistenceService;
-import com.mfsi.appbuilder.tenant.service.APIService;
+import com.mfsi.appbuilder.tenant.service.TenantAPIService;
 import com.mfsi.appbuilder.util.AppBuilderUtil;
 import com.mfsi.appbuilder.util.MySQLDatabaseGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 
 @RestController
 @RequestMapping("/project")
@@ -32,9 +35,12 @@ public class ProjectController {
 
 	@Autowired
 	private PersistenceService persistenceService;
-	
+
 	@Autowired
-	private APIService apiService;
+	private TenantAPIService tenantAPIService;
+
+	@Autowired
+	private AppService appService;
 
 	/**
 	 * getting all projects created by a user
@@ -49,7 +55,7 @@ public class ProjectController {
 
 	@PostMapping("/create")
 	private Project createProject(@RequestBody ProjectDTO projectDTO, Principal principal) throws Exception {
-        projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
+		projectDTO.setUserId(AppBuilderUtil.getLoggedInUserId());
 		Connection conn = persistenceService.getMySqlConnection(projectDTO.getDbDetailsDTO().getDbURL(), projectDTO.getDbDetailsDTO().getDbUsername()
 				, projectDTO.getDbDetailsDTO().getDbPassword());
 		if (conn == null)
@@ -59,7 +65,10 @@ public class ProjectController {
 			conn.close();
 			MySQLDatabaseGenerator.createSchemaMetatdata(projectDTO.getDbDetailsDTO(),"com.mfsi.appbuilder.tenant.entity");
 		}
-		return persistenceService.saveProject(projectDTO);
+		Project project = persistenceService.saveProject(projectDTO);
+		if(project.getWantSecurity())
+			appService.createGenerateTokenAPI(project);
+		return project;
 	}
 
 	/**
@@ -96,12 +105,12 @@ public class ProjectController {
 	 */
 	@PostMapping("/createAPI")
 	public void createAPI(@RequestBody ApiDto apiDTO) throws SQLException {
-		
+
 		System.out.println("inside create");
 		persistenceService.createAPI(apiDTO);
-		apiService.saveAPI(apiDTO);
+		tenantAPIService.saveAPI(apiDTO);
 	}
-	
+
 	/**
 	 * method to create a new API for a project
 	 * author: shubham
@@ -109,7 +118,9 @@ public class ProjectController {
 	 */
 	@PostMapping("/updateAPI")
 	public void updateAPI(@RequestBody ApiDto apiDTO) {
+		API preAPI = persistenceService.findAPIById(apiDTO.getId());
 		persistenceService.updateAPI(apiDTO);
+		tenantAPIService.updateAPI(apiDTO, tenantAPIService.findAPIbyURL(preAPI.getApiUrl()));
 	}
 
 
@@ -123,7 +134,7 @@ public class ProjectController {
 	public List<API> getAPI(@PathVariable String projectId) {
 		return persistenceService.getAPI(projectId);
 	}
-	
+
 	/**
 	 * Method for permanently delete the api
 	 * author: shubham
@@ -131,8 +142,9 @@ public class ProjectController {
 	 */
 	@PostMapping("/deleteApi")
 	public void deleteAPI(@RequestBody ApiDto api) {
-		
+
 		persistenceService.deleteApi(api.getId());
+		tenantAPIService.deleteByUrl(api.getApiUrl());
 	}
 
 	/**
@@ -148,7 +160,7 @@ public class ProjectController {
 	}
 
 	@PostMapping("/createTable")
-    public Map<String, List<MetaDataDTO>> createTable(@RequestBody TableDetailsDTO dto) {
+	public Map<String, List<MetaDataDTO>> createTable(@RequestBody TableDetailsDTO dto) {
 		return persistenceService.createTable(dto);
 	}
 

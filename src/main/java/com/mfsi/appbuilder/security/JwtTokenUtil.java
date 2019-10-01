@@ -20,7 +20,12 @@ import static com.mfsi.appbuilder.util.Constants.SIGNING_KEY;
 @Component
 public class JwtTokenUtil implements Serializable {
 
-    public String getUsernameFromToken(String token) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5979656290917962202L;
+
+	public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 

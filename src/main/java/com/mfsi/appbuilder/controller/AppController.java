@@ -1,5 +1,36 @@
 package com.mfsi.appbuilder.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 /**
  * 
  */
@@ -15,18 +46,6 @@ import com.mfsi.appbuilder.model.Parameter;
 import com.mfsi.appbuilder.service.AppService;
 import com.mfsi.appbuilder.service.AppServiceImpl;
 import com.mfsi.appbuilder.service.PersistenceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -67,28 +86,27 @@ public class AppController {
 		List<API> apis = persistenceService.getAPI(projectId);
 		Project projectDetails = persistenceService.getProjectDetails(projectId);
 		Boolean wantedSecurity = projectDetails.getWantSecurity();
-		
-		String dest = null;
 
+		String dest = null;
+		this.projectName = projectDetails.getProjectName();
+
+		dest = destination + File.separator + projectName;
+		this.dest = dest;
+		appService.copyFolder(src, dest, wantedSecurity);
 		// loop on all apis
 		for (API api : apis) {
-
+			if(api.getApiUrl().equals("token/generate-token")) {
+				appService.createUserEntityForSecurity(api,dest);
+				continue;
+			}
 			// for creating the repository method name like findBy"something"
 			if (api.getApiType().equalsIgnoreCase("get"))
 				getApiMethodName = appService.createMethodName(api.getGetParams());
+			Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
+			appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
 
-			dest = destination + File.separator + api.getProjectName();
-
-			this.projectName = api.getProjectName();
-			this.dest = dest;
-
-			if (appService.copyFolder(src, dest, wantedSecurity)) {
-
-				Map<String, List<ApiJsonTemplate>> entitiesMap = appService.prepareEntitiesMap(api.getJsonString());
-				appService.generateFilesFromTemplateV2(entitiesMap, src, dest + File.separator, api, getApiMethodName);
-			}
 		}
-		Map<String, Object> appPropsMap = new HashMap<String, Object>();
+		Map<String, Object> appPropsMap = new HashMap<>();
 
 
 		appPropsMap.put("db_schemaname", projectDetails.getDbDetailsDTO().getSchema());
@@ -134,7 +152,7 @@ public class AppController {
 		 * method call for deleting the project folder after zip has been created
 		 */
 		this.recursiveDelete(new File(folder));
-		
+
 		/**
 		 * method call for deleting the zip after download
 		 */

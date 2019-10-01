@@ -1,10 +1,11 @@
-package com.mfsi.appbuilder.dto;
-
-import org.springframework.security.core.GrantedAuthority;
+package com.app.security.dto;
 
 import java.util.Collection;
 
+import org.springframework.security.core.GrantedAuthority;
+
 public class User extends org.springframework.security.core.userdetails.User {
+	
 	private String userId;
     private String token;
 

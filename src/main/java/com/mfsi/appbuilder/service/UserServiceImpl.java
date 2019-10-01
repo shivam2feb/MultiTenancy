@@ -1,9 +1,10 @@
 package com.mfsi.appbuilder.service;
 
 
-import com.mfsi.appbuilder.master.document.User;
-import com.mfsi.appbuilder.master.repository.UserDao;
-import com.mfsi.appbuilder.model.UserDto;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import com.mfsi.appbuilder.master.document.User;
+import com.mfsi.appbuilder.master.repository.UserDao;
+import com.mfsi.appbuilder.model.UserDto;
 
 
 @Service(value = "userService")
@@ -36,7 +35,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         if (user == null) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        return new com.mfsi.appbuilder.dto.User(String.valueOf(user.getId()), user.getUsername(), user.getPassword(), getAuthority());
+        return new com.mfsi.appbuilder.dto.AppUser(String.valueOf(user.getId()), user.getUsername(), user.getPassword(), getAuthority());
     }
 
     private List<SimpleGrantedAuthority> getAuthority() {

@@ -1,5 +1,6 @@
 package com.mfsi.appbuilder.master.document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,15 +12,15 @@ public class API {
 	private String id;
 	private String apiName;
 	private String apiType;
-	private List<ApiJsonTemplate> jsonString;
+	private List<ApiJsonTemplate> jsonString=new ArrayList<>();
 	private String projectName;
 	private String projectId;
 	private String apiUrl;
 	private String mainEntityName;
 	private String mainEntityIdType;
 	private List<ApiJsonTemplate> getParams;
-	private boolean isSecured;
-	
+	private boolean secured;
+	private String reJson;
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -32,7 +33,7 @@ public class API {
 		result = prime * result + ((apiUrl == null) ? 0 : apiUrl.hashCode());
 		result = prime * result + ((getParams == null) ? 0 : getParams.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + (isSecured ? 1231 : 1237);
+		result = prime * result + (secured ? 1231 : 1237);
 		result = prime * result + ((jsonString == null) ? 0 : jsonString.hashCode());
 		result = prime * result + ((mainEntityIdType == null) ? 0 : mainEntityIdType.hashCode());
 		result = prime * result + ((mainEntityName == null) ? 0 : mainEntityName.hashCode());
@@ -77,7 +78,7 @@ public class API {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (isSecured != other.isSecured)
+		if (secured != other.secured)
 			return false;
 		if (jsonString == null) {
 			if (other.jsonString != null)
@@ -110,16 +111,16 @@ public class API {
 	 * @return the isSecured
 	 */
 	public boolean isSecured() {
-		return isSecured;
+		return secured;
 	}
 	/**
 	 * @param isSecured the isSecured to set
 	 */
 	public void setSecured(boolean isSecured) {
-		this.isSecured = isSecured;
+		this.secured = isSecured;
 	}
 
-	private String reJson;
+	
 	
 	
 	public String getReJson() {

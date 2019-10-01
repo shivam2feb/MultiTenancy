@@ -11,6 +11,9 @@ import com.mfsi.appbuilder.master.document.API;
 public interface APIRepository extends MongoRepository<API, String>{
 	
 	public List<API> findByProjectId(String projectId);
+	public API findByApiUrl(String apiUrl);
+	public void deleteByProjectId(String projectId);
+	
 	
 }
 

@@ -1,4 +1,4 @@
-package com.app.entity;
+package com.app.security.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,20 +14,20 @@ public class API {
 	private String apiName;
 	private String apiType;
 	private String apiUrl;
-	private boolean isSecured;
+	private boolean secured;
 	
 	
 	/**
-	 * @return the isSecured
+	 * @return the secured
 	 */
 	public boolean isSecured() {
-		return isSecured;
+		return secured;
 	}
 	/**
 	 * @param isSecured the isSecured to set
 	 */
-	public void setSecured(boolean isSecured) {
-		this.isSecured = isSecured;
+	public void setSecured(boolean secured) {
+		this.secured = secured;
 	}
 
 	public int getId() {

@@ -1,4 +1,4 @@
-package com.app.security;
+package com.app.security.config;
 
 
 import java.util.List;
@@ -20,7 +20,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.app.entity.API;
+import com.app.security.entity.API;
 
 @Configuration
 @EnableWebSecurity
